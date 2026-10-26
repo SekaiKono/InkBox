@@ -1,0 +1,2990 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>墨盒．InkBox</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    id="hljs-theme-dark">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css"
+    id="hljs-theme-light" disabled>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown-dark.min.css"
+    id="md-theme-dark">
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown-light.min.css"
+    id="md-theme-light" disabled>
+  <!-- 告訴瀏覽器這是一個 PWA App -->
+  <link rel="manifest" href="manifest.json">
+  <!-- 手機端專用的主題色（會影響手機頂部狀態列） -->
+  <meta name="theme-color" content="#1e1e1e">
+  <!-- 網頁分頁的圖示 (可選) -->
+  <!-- <link rel="icon" href="icon-192.png" type="image/png"> -->
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+      background-color: #1e1e1e;
+      color: #d4d4d4;
+      -webkit-text-size-adjust: 100%;
+      overscroll-behavior: none;
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* ===== 主題變數 ===== */
+    :root,
+    body.theme-dark {
+      --bg-main: #1e1e1e;
+      --bg-topbar: #323233;
+      --bg-panel-header: #252526;
+      --bg-sidebar: #252526;
+      --bg-sidebar-hover: #2a2d2e;
+      --bg-sidebar-active: #094771;
+      --bg-input: #1e1e1e;
+      --bg-preview: #1e1e1e;
+      --bg-btn: #3a3d41;
+      --bg-btn-hover: #4a4d51;
+      --bg-btn-active: #2a2d31;
+      --bg-dropdown: #2d2d30;
+      --bg-toolbar: #2a2d2e;
+      --bg-code: #2d2d2d;
+      --bg-code-border: #3e3e3e;
+      --bg-toast: #2d2d30;
+      --bg-modal: #2d2d30;
+      --bg-divider: #2a2a2a;
+      --bg-table-nth: #252526;
+      --bg-progress: rgba(0, 0, 0, 0.7);
+      --border-main: #3c3c3c;
+      --border-input: #4a4d51;
+      --border-hover: #5a5d61;
+      --border-dropdown: #454545;
+      --text-main: #d4d4d4;
+      --text-bright: #e0e0e0;
+      --text-dim: #cccccc;
+      --text-muted: #808080;
+      --text-faint: #6a6a6a;
+      --text-link: #569cd6;
+      --accent: #0e639c;
+      --accent-hover: #1177bb;
+      --accent-border: #1177bb;
+      --success: #4ec9b0;
+      --error: #f48771;
+      --selection: #264f78;
+      --selection-text: #ffffff;
+      --scrollbar-track: #1e1e1e;
+      --scrollbar-thumb: #424242;
+      --scrollbar-thumb-hover: #4f4f4f;
+      --brand-icon: #569cd6;
+      --svg-icon: #519aba;
+      --folder-icon: #dcb67a;
+      --format-bg: #3a3d41;
+      --format-hover: #4a4d51;
+      --format-border: #4a4d51;
+      --format-active-bg: #0e639c;
+      --format-active-border: #1177bb;
+      --format-active-text: #ffffff;
+      --heading-accent: #569cd6;
+      --color-panel-bg: #2d2d30;
+      --color-panel-border: #454545;
+      --color-panel-title: #808080;
+      --color-panel-label: #a0a0a0;
+      --modal-overlay: rgba(0, 0, 0, 0.6);
+      --toast-border: #4a4d51;
+      --table-border: #3c3c3c;
+      --pre-bg: #2d2d2d;
+      --pre-border: #3e3e3e;
+      --hr-color: #3c3c3c;
+      --blockquote-border: #3c3c3c;
+      --blockquote-text: #a0a0a0;
+      --img-border: #3e3e3e;
+      --img-bg: #252526;
+      --img-error-bg: #3a1e1e;
+      --img-error-border: #f48771;
+      --mark-bg: #ffd93d;
+      --mark-text: #1e1e1e;
+      --placeholder: #6a6a6a;
+    }
+
+    body.theme-light {
+      --bg-main: #ffffff;
+      --bg-topbar: #f3f3f3;
+      --bg-panel-header: #f3f3f3;
+      --bg-sidebar: #f3f3f3;
+      --bg-sidebar-hover: #e8e8e8;
+      --bg-sidebar-active: #cce4f7;
+      --bg-input: #ffffff;
+      --bg-preview: #ffffff;
+      --bg-btn: #e8e8e8;
+      --bg-btn-hover: #d8d8d8;
+      --bg-btn-active: #cccccc;
+      --bg-dropdown: #ffffff;
+      --bg-toolbar: #f3f3f3;
+      --bg-code: #f6f8fa;
+      --bg-code-border: #e1e4e8;
+      --bg-toast: #333333;
+      --bg-modal: #ffffff;
+      --bg-divider: #e0e0e0;
+      --bg-table-nth: #f6f8fa;
+      --bg-progress: rgba(255, 255, 255, 0.85);
+      --border-main: #e0e0e0;
+      --border-input: #d0d0d0;
+      --border-hover: #b0b0b0;
+      --border-dropdown: #d0d0d0;
+      --text-main: #24292e;
+      --text-bright: #1a1a1a;
+      --text-dim: #333333;
+      --text-muted: #6a737d;
+      --text-faint: #8a8a8a;
+      --text-link: #0366d6;
+      --accent: #0366d6;
+      --accent-hover: #0052b3;
+      --accent-border: #0052b3;
+      --success: #22863a;
+      --error: #d73a49;
+      --selection: #b3d7ff;
+      --selection-text: #000000;
+      --scrollbar-track: #f0f0f0;
+      --scrollbar-thumb: #c0c0c0;
+      --scrollbar-thumb-hover: #a0a0a0;
+      --brand-icon: #0366d6;
+      --svg-icon: #0366d6;
+      --folder-icon: #d4a017;
+      --format-bg: #e8e8e8;
+      --format-hover: #d8d8d8;
+      --format-border: #d0d0d0;
+      --format-active-bg: #0366d6;
+      --format-active-border: #0052b3;
+      --format-active-text: #ffffff;
+      --heading-accent: #0366d6;
+      --color-panel-bg: #ffffff;
+      --color-panel-border: #d0d0d0;
+      --color-panel-title: #6a737d;
+      --color-panel-label: #6a737d;
+      --modal-overlay: rgba(0, 0, 0, 0.4);
+      --toast-border: #555555;
+      --table-border: #dfe2e5;
+      --pre-bg: #f6f8fa;
+      --pre-border: #e1e4e8;
+      --hr-color: #e1e4e8;
+      --blockquote-border: #dfe2e5;
+      --blockquote-text: #6a737d;
+      --img-border: #e1e4e8;
+      --img-bg: #f6f8fa;
+      --img-error-bg: #ffeef0;
+      --img-error-border: #d73a49;
+      --mark-bg: #fff5b1;
+      --mark-text: #24292e;
+      --placeholder: #8a8a8a;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+    }
+
+    .topbar {
+      height: 38px;
+      min-height: 38px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      background-color: var(--bg-topbar);
+      border-bottom: 1px solid var(--border-main);
+      font-size: 13px;
+      color: var(--text-dim);
+      position: relative;
+      z-index: 100;
+    }
+
+    .topbar .left-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .topbar .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    .topbar .brand svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--brand-icon);
+    }
+
+    .topbar .top-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background-color: var(--bg-btn);
+      color: var(--text-main);
+      border: 1px solid var(--border-input);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background-color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .btn:hover {
+      background-color: var(--bg-btn-hover);
+      border-color: var(--border-hover);
+    }
+
+    .btn:active {
+      background-color: var(--bg-btn-active);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn svg {
+      width: 13px;
+      height: 13px;
+      fill: currentColor;
+      opacity: 0.9;
+    }
+
+    .main-area {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-main);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: width 0.15s, min-width 0.15s;
+    }
+
+    .sidebar.collapsed {
+      width: 0;
+      min-width: 0;
+      border-right: none;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border-main);
+      font-size: 12px;
+      color: var(--text-dim);
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .sidebar-header .folder-name {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sidebar-header .folder-name svg {
+      width: 14px;
+      height: 14px;
+      fill: var(--folder-icon);
+      flex-shrink: 0;
+    }
+
+    .sidebar-header .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      border-radius: 3px;
+    }
+
+    .sidebar-header .close-btn:hover {
+      background-color: var(--bg-btn);
+      color: var(--text-bright);
+    }
+
+    .sidebar-header .close-btn svg {
+      width: 13px;
+      height: 13px;
+      fill: currentColor;
+    }
+
+    .sidebar-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 0;
+    }
+
+    .file-list {
+      list-style: none;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-size: 12.5px;
+      color: var(--text-dim);
+      border-left: 2px solid transparent;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-item:hover {
+      background-color: var(--bg-sidebar-hover);
+    }
+
+    .file-item.active {
+      background-color: var(--bg-sidebar-active);
+      color: var(--text-bright);
+      border-left-color: var(--accent);
+    }
+
+    .file-item svg {
+      width: 13px;
+      height: 13px;
+      fill: var(--svg-icon);
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: 6px 10px;
+      border-top: 1px solid var(--border-main);
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sidebar-empty {
+      padding: 20px 12px;
+      color: var(--text-faint);
+      font-size: 12px;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .editor-container {
+      display: flex;
+      flex: 1;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .editor-container.horizontal {
+      flex-direction: row;
+    }
+
+    .editor-container.vertical {
+      flex-direction: column;
+    }
+
+    .source-panel,
+    .preview-panel {
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-main);
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .panel-fixed {
+      flex-shrink: 0;
+    }
+
+    .panel-flex {
+      flex: 1;
+    }
+
+    .divider {
+      background-color: var(--bg-divider);
+      flex-shrink: 0;
+      position: relative;
+      transition: background-color 0.15s;
+      touch-action: none;
+      user-select: none;
+      z-index: 10;
+    }
+
+    .editor-container.horizontal .divider {
+      width: 6px;
+      cursor: col-resize;
+    }
+
+    .editor-container.vertical .divider {
+      height: 6px;
+      cursor: row-resize;
+    }
+
+    .divider:hover,
+    .divider.active {
+      background-color: var(--accent);
+    }
+
+    .divider::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background-color: var(--text-faint);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+
+    .editor-container.horizontal .divider::after {
+      width: 2px;
+      height: 40px;
+    }
+
+    .editor-container.vertical .divider::after {
+      width: 40px;
+      height: 2px;
+    }
+
+    .divider:hover::after,
+    .divider.active::after {
+      background-color: var(--accent-hover);
+    }
+
+    @media (max-width: 768px) {
+      .editor-container.horizontal .divider {
+        width: 10px;
+      }
+
+      .editor-container.vertical .divider {
+        height: 10px;
+      }
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background-color: var(--bg-panel-header);
+      border-bottom: 1px solid var(--border-main);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-dim);
+      letter-spacing: 0.3px;
+      user-select: none;
+      flex-shrink: 0;
+      min-height: 35px;
+    }
+
+    .panel-header .title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .panel-header .title .file-name {
+      color: var(--text-muted);
+      font-weight: 400;
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 200px;
+    }
+
+    .panel-header svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      opacity: 0.8;
+      flex-shrink: 0;
+    }
+
+    .panel-header .header-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .format-toggle-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--border-input);
+      color: var(--text-dim);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.15s, border-color 0.15s;
+    }
+
+    .format-toggle-btn:hover {
+      background-color: var(--bg-btn);
+    }
+
+    .format-toggle-btn.active {
+      background-color: var(--format-active-bg);
+      border-color: var(--format-active-border);
+      color: var(--format-active-text);
+    }
+
+    .format-toolbar {
+      display: none;
+      flex-wrap: wrap;
+      gap: 3px;
+      padding: 6px 8px;
+      background-color: var(--bg-toolbar);
+      border-bottom: 1px solid var(--border-main);
+      flex-shrink: 0;
+    }
+
+    .format-toolbar.show {
+      display: flex;
+    }
+
+    .format-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 30px;
+      height: 28px;
+      padding: 0 6px;
+      background-color: var(--format-bg);
+      color: var(--text-main);
+      border: 1px solid var(--format-border);
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.15s, border-color 0.15s;
+      position: relative;
+    }
+
+    .format-btn:hover {
+      background-color: var(--format-hover);
+      border-color: var(--border-hover);
+    }
+
+    .format-btn:active {
+      background-color: var(--bg-btn-active);
+    }
+
+    .format-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    .format-btn.text-icon {
+      font-weight: 600;
+    }
+
+    .format-btn.italic-icon {
+      font-style: italic;
+      font-family: Georgia, serif;
+    }
+
+    .format-btn.strike-icon {
+      text-decoration: line-through;
+    }
+
+    .format-btn.sep {
+      min-width: 1px;
+      width: 1px;
+      height: 20px;
+      background: var(--border-input);
+      border: none;
+      padding: 0;
+      margin: 4px 3px;
+      cursor: default;
+    }
+
+    .format-btn.sep:hover {
+      background: var(--border-input);
+    }
+
+    .heading-dropdown-wrap {
+      position: relative;
+    }
+
+    .heading-dropdown {
+      position: absolute;
+      top: 32px;
+      left: 0;
+      background-color: var(--bg-dropdown);
+      border: 1px solid var(--border-dropdown);
+      border-radius: 6px;
+      padding: 4px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      display: none;
+      flex-direction: column;
+      gap: 1px;
+      z-index: 300;
+      min-width: 130px;
+    }
+
+    .heading-dropdown.open {
+      display: flex;
+    }
+
+    .heading-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+      color: var(--text-main);
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      width: 100%;
+    }
+
+    .heading-item:hover {
+      background-color: var(--bg-sidebar-active);
+    }
+
+    .heading-item .h-num {
+      color: var(--heading-accent);
+      font-weight: 600;
+      font-family: monospace;
+      min-width: 28px;
+    }
+
+    .color-panel {
+      position: absolute;
+      top: 32px;
+      left: 0;
+      background-color: var(--color-panel-bg);
+      border: 1px solid var(--color-panel-border);
+      border-radius: 6px;
+      padding: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      display: none;
+      z-index: 300;
+      width: 200px;
+    }
+
+    .color-panel.open {
+      display: block;
+    }
+
+    .color-panel .color-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .color-swatch {
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.1s, transform 0.1s;
+    }
+
+    .color-swatch:hover {
+      border-color: var(--accent);
+      transform: scale(1.08);
+    }
+
+    .color-panel .custom-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-main);
+    }
+
+    .color-panel .custom-row label {
+      font-size: 12px;
+      color: var(--color-panel-label);
+      flex: 1;
+    }
+
+    .color-panel input[type="color"] {
+      width: 40px;
+      height: 28px;
+      border: 1px solid var(--border-input);
+      border-radius: 4px;
+      background-color: transparent;
+      cursor: pointer;
+      padding: 1px;
+    }
+
+    .color-panel .panel-title {
+      font-size: 11px;
+      color: var(--color-panel-title);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    #markdown-input {
+      flex: 1;
+      width: 100%;
+      padding: 20px;
+      background-color: var(--bg-input);
+      color: var(--text-main);
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: 'Fira Code', 'Cascadia Code', 'Consolas', 'Monaco', monospace;
+      font-size: 15px;
+      line-height: 1.6;
+      tab-size: 4;
+      overflow-y: auto;
+      caret-color: var(--accent);
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    #markdown-input.nowrap {
+      white-space: pre;
+      overflow-x: auto;
+      word-break: normal;
+    }
+
+    #markdown-input.wrap {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    #markdown-input::-webkit-scrollbar,
+    .preview-content::-webkit-scrollbar,
+    .sidebar-body::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    #markdown-input::-webkit-scrollbar-track,
+    .preview-content::-webkit-scrollbar-track,
+    .sidebar-body::-webkit-scrollbar-track {
+      background: var(--scrollbar-track);
+    }
+
+    #markdown-input::-webkit-scrollbar-thumb,
+    .preview-content::-webkit-scrollbar-thumb,
+    .sidebar-body::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border-radius: 5px;
+    }
+
+    #markdown-input::-webkit-scrollbar-thumb:hover,
+    .preview-content::-webkit-scrollbar-thumb:hover {
+      background: var(--scrollbar-thumb-hover);
+    }
+
+    .preview-content {
+      flex: 1;
+      padding: 20px 25px 120px 25px;
+      overflow-y: auto;
+      overflow-x: auto;
+      background-color: var(--bg-preview);
+      color: var(--text-main);
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    .markdown-body {
+      background-color: transparent !important;
+      color: var(--text-main) !important;
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 100%;
+    }
+
+    .markdown-body.wrap-mode {
+      word-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .markdown-body.nowrap-mode {
+      word-wrap: normal;
+      word-break: normal;
+    }
+
+    .markdown-body.nowrap-mode p,
+    .markdown-body.nowrap-mode li,
+    .markdown-body.nowrap-mode td,
+    .markdown-body.nowrap-mode th {
+      white-space: nowrap;
+    }
+
+    .markdown-body.nowrap-mode pre {
+      white-space: pre;
+    }
+
+    .markdown-body.wrap-mode pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .markdown-body pre {
+      background-color: var(--pre-bg) !important;
+      border-radius: 6px;
+      padding: 16px !important;
+      overflow-x: auto;
+      border: 1px solid var(--pre-border);
+    }
+
+    .markdown-body code {
+      background-color: var(--bg-code) !important;
+      color: var(--text-main) !important;
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+      font-size: 0.9em;
+      font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    }
+
+    .markdown-body pre code {
+      background-color: transparent !important;
+      padding: 0 !important;
+      font-size: 0.9em;
+      line-height: 1.5;
+    }
+
+    .markdown-body h1,
+    .markdown-body h2,
+    .markdown-body h3,
+    .markdown-body h4,
+    .markdown-body h5,
+    .markdown-body h6 {
+      color: var(--text-bright);
+      border-bottom-color: var(--border-main);
+    }
+
+    .markdown-body a {
+      color: var(--text-link);
+    }
+
+    .markdown-body blockquote {
+      border-left-color: var(--blockquote-border);
+      color: var(--blockquote-text);
+    }
+
+    .markdown-body table th,
+    .markdown-body table td {
+      border-color: var(--table-border);
+    }
+
+    .markdown-body table tr {
+      background-color: transparent;
+      border-top-color: var(--table-border);
+    }
+
+    .markdown-body table tr:nth-child(2n) {
+      background-color: var(--bg-table-nth);
+    }
+
+    .markdown-body hr {
+      background-color: var(--hr-color);
+    }
+
+    .markdown-body img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 12px 0;
+      border-radius: 6px;
+      border: 1px solid var(--img-border);
+      background-color: var(--img-bg);
+    }
+
+    .markdown-body img.img-error {
+      border: 1px dashed var(--img-error-border);
+      padding: 20px;
+      min-height: 60px;
+      background-color: var(--img-error-bg);
+    }
+
+    .markdown-body mark {
+      background-color: var(--mark-bg);
+      color: var(--mark-text);
+      padding: 0.1em 0.3em;
+      border-radius: 3px;
+    }
+
+    ::selection {
+      background-color: var(--selection);
+      color: var(--selection-text);
+    }
+
+    .placeholder-hint {
+      color: var(--placeholder);
+      font-style: italic;
+    }
+
+    body.resizing {
+      user-select: none;
+    }
+
+    body.resizing * {
+      user-select: none !important;
+    }
+
+    .editor-container.horizontal.resizing {
+      cursor: col-resize;
+    }
+
+    .editor-container.vertical.resizing {
+      cursor: row-resize;
+    }
+
+    .dropdown {
+      position: absolute;
+      top: 42px;
+      background-color: var(--bg-dropdown);
+      border: 1px solid var(--border-dropdown);
+      border-radius: 6px;
+      padding: 6px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+      z-index: 200;
+      min-width: 200px;
+    }
+
+    .dropdown.open {
+      display: flex;
+    }
+
+    .dropdown.right {
+      right: 12px;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+      color: var(--text-main);
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      width: 100%;
+    }
+
+    .dropdown-item:hover {
+      background-color: var(--bg-sidebar-active);
+    }
+
+    .dropdown-item:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .dropdown-item:disabled:hover {
+      background-color: transparent;
+    }
+
+    .dropdown-item svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+      opacity: 0.8;
+      flex-shrink: 0;
+    }
+
+    .dropdown-item .label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dropdown-item .sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    .dropdown-item .check {
+      opacity: 0.9;
+      color: var(--success);
+      font-weight: 700;
+      margin-left: auto;
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background-color: var(--border-main);
+      margin: 4px 2px;
+    }
+
+    @media (max-width: 600px) {
+      .preview-content {
+        padding-bottom: 160px;
+      }
+
+      .topbar .brand span {
+        display: none;
+      }
+
+      .btn .btn-label {
+        display: none;
+      }
+
+      .btn {
+        padding: 5px 8px;
+      }
+
+      .sidebar {
+        width: 180px;
+      }
+
+      .dropdown {
+        min-width: 180px;
+      }
+
+      .format-btn {
+        min-width: 32px;
+        height: 30px;
+      }
+
+      .color-panel {
+        width: 180px;
+      }
+
+      .color-swatch {
+        width: 26px;
+        height: 26px;
+      }
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--modal-overlay);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background-color: var(--bg-modal);
+      border: 1px solid var(--border-dropdown);
+      border-radius: 8px;
+      padding: 20px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .modal h3 {
+      font-size: 15px;
+      color: var(--text-bright);
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .modal label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      margin-top: 10px;
+    }
+
+    .modal input[type="text"] {
+      width: 100%;
+      background-color: var(--bg-input);
+      color: var(--text-main);
+      border: 1px solid var(--border-input);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .modal input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    .modal .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .modal .modal-actions button {
+      padding: 6px 14px;
+      font-size: 13px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      border: 1px solid var(--border-input);
+      background-color: var(--bg-btn);
+      color: var(--text-main);
+    }
+
+    .modal .modal-actions button:hover {
+      background-color: var(--bg-btn-hover);
+    }
+
+    .modal .modal-actions button.primary {
+      background-color: var(--accent);
+      border-color: var(--accent-border);
+      color: #ffffff;
+    }
+
+    .modal .modal-actions button.primary:hover {
+      background-color: var(--accent-hover);
+    }
+
+    /* 通知 toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      /* 👇 這裡改成固定的深色背景和淺色文字，不管主題是什麼都看得清楚 */
+      background-color: #333333;
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 6px;
+      border: 1px solid #555555;
+      font-size: 13px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s;
+      max-width: 80vw;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    .toast.success {
+      border-color: #4ec9b0;
+    }
+
+    .toast.error {
+      border-color: #f48771;
+    }
+
+    /* 👇 如果之後想讓淺色模式的 toast 變成「白底黑字」，可以在下面加上這段（可選） */
+    body.theme-light .toast {
+      background-color: #ffffff;
+      color: #24292e;
+      border: 1px solid #d0d0d0;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .progress-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--bg-progress);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1500;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .progress-overlay.show {
+      display: flex;
+    }
+
+    .progress-spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(86, 156, 214, 0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .progress-text {
+      color: var(--text-main);
+      font-size: 14px;
+      text-align: center;
+      max-width: 80vw;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+
+      #printArea,
+      #printArea * {
+        visibility: visible;
+      }
+
+      #printArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 20px;
+      }
+
+      #printArea * {
+        color: #000000 !important;
+        border-color: #cccccc !important;
+      }
+
+      #printArea pre {
+        background: #f5f5f5 !important;
+      }
+
+      #printArea code {
+        background: #f5f5f5 !important;
+        color: #000000 !important;
+      }
+    }
+
+    #printArea {
+      display: none;
+    }
+  </style>
+</head>
+
+<body class="theme-dark">
+  <div class="app">
+    <div class="topbar">
+      <div class="left-group">
+        <button class="btn" id="toggle-sidebar-top-btn" title="顯示/隱藏檔案列表">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z" />
+          </svg>
+          <span class="btn-label">列表</span>
+        </button>
+        <div class="brand">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M20.5 4h-17C2.1 4 1 5.1 1 6.5v11C1 18.9 2.1 20 3.5 20h17c1.4 0 2.5-1.1 2.5-2.5v-11C23 5.1 21.9 4 20.5 4zM11 15H9v-4H7v4H5V9h2v2h2V9h2v6zm3-6h2v4h2v2h-4V9zm7 2h-2v2h-2v-2h-2V9h2V7h2v2h2v2z" />
+          </svg>
+          <span>Markdown 編輯器</span>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button class="btn" id="save-btn" title="儲存目前檔案 (Ctrl+S)" disabled>
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" />
+          </svg>
+          <span class="btn-label">儲存</span>
+        </button>
+        <button class="btn" id="file-menu-btn" title="檔案選單">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
+          </svg>
+          <span class="btn-label">檔案</span>
+        </button>
+        <button class="btn" id="export-menu-btn" title="導出">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
+          </svg>
+          <span class="btn-label">導出</span>
+        </button>
+        <button class="btn" id="swap-btn" title="交換左右區域">
+          <svg viewBox="0 0 24 24">
+            <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z" />
+          </svg>
+          <span class="btn-label">交換</span>
+        </button>
+        <button class="btn" id="settings-btn" title="設定">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+          </svg>
+          <span class="btn-label">設定</span>
+        </button>
+      </div>
+
+      <div class="dropdown right" id="fileMenu">
+        <button class="dropdown-item" id="open-folder-btn">
+          <span class="label">
+            <svg viewBox="0 0 24 24">
+              <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+            </svg>
+            打開資料夾
+          </span>
+        </button>
+        <button class="dropdown-item" id="open-files-btn">
+          <span class="label">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
+            </svg>
+            選擇多個檔案
+          </span>
+        </button>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item" id="import-btn">
+          <span class="label">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
+            </svg>
+            導入 .md 檔
+          </span>
+        </button>
+      </div>
+
+      <div class="dropdown right" id="exportMenu">
+        <button class="dropdown-item" id="export-md-btn">
+          <span class="label">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
+            </svg>
+            導出 Markdown
+          </span>
+          <span class="sub">.md</span>
+        </button>
+        <button class="dropdown-item" id="export-html-btn">
+          <span class="label">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2 2h8v2H8V8zm0 4h8v2H8v-2z" />
+            </svg>
+            導出 HTML
+          </span>
+          <span class="sub">.html</span>
+        </button>
+        <button class="dropdown-item" id="export-pdf-btn">
+          <span class="label">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z" />
+            </svg>
+            導出 PDF
+          </span>
+          <span class="sub">列印</span>
+        </button>
+        <button class="dropdown-item" id="export-png-btn">
+          <span class="label">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+            </svg>
+            導出圖片 PNG
+          </span>
+          <span class="sub">.png</span>
+        </button>
+      </div>
+
+      <div class="dropdown right" id="settingsDropdown">
+        <button class="dropdown-item" id="layout-horizontal">
+          <span class="label">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 3h8v18H3V3zm10 0h8v18h-8V3z" />
+            </svg>
+            左右分割
+          </span>
+          <span class="check" id="check-horizontal">✓</span>
+        </button>
+        <button class="dropdown-item" id="layout-vertical">
+          <span class="label">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 3h18v8H3V3zm0 10h18v8H3v-8z" />
+            </svg>
+            上下分割
+          </span>
+          <span class="check" id="check-vertical" style="visibility:hidden;">✓</span>
+        </button>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item" id="toggle-wrap">
+          <span class="label">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 6h16v2H4zm0 5h10v2H4zm0 5h16v2H4zm12-5l4 4-4 4V11z" fill="currentColor" />
+            </svg>
+            自動換行
+          </span>
+          <span class="check" id="check-wrap">✓</span>
+        </button>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item" id="toggle-theme">
+          <span class="label">
+            <svg viewBox="0 0 24 24" id="theme-icon">
+              <path
+                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" />
+            </svg>
+            <span id="theme-label">淺色模式</span>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <div class="sidebar collapsed" id="sidebar">
+        <div class="sidebar-header">
+          <span class="folder-name" id="folderName">
+            <svg viewBox="0 0 24 24">
+              <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+            </svg>
+            <span id="folderNameText">未開啟資料夾</span>
+          </span>
+          <button class="close-btn" id="collapse-sidebar-btn" title="收合側邊欄">
+            <svg viewBox="0 0 24 24">
+              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+            </svg>
+          </button>
+        </div>
+        <div class="sidebar-body" id="sidebarBody">
+          <div class="sidebar-empty">尚未選擇資料夾<br>點上方「檔案」選單開啟</div>
+        </div>
+        <div class="sidebar-footer" id="sidebarFooter" style="display:none;">
+          <span id="fileCount">0 個檔案</span>
+          <span id="modeLabel" style="color:var(--success);">完整模式</span>
+        </div>
+      </div>
+
+      <div class="editor-container horizontal" id="editorContainer">
+        <div class="source-panel panel-fixed" id="sourcePanel">
+          <div class="panel-header">
+            <span class="title">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M20.5 4h-17C2.1 4 1 5.1 1 6.5v11C1 18.9 2.1 20 3.5 20h17c1.4 0 2.5-1.1 2.5-2.5v-11C23 5.1 21.9 4 20.5 4zM11 15H9v-4H7v4H5V9h2v2h2V9h2v6zm3-6h2v4h2v2h-4V9zm7 2h-2v2h-2v-2h-2V9h2V7h2v2h2v2z" />
+              </svg>
+              <span id="source-title">Markdown 源碼</span>
+              <span class="file-name" id="currentFileName"></span>
+            </span>
+            <span class="header-right">
+              <button class="format-toggle-btn" id="format-toggle-btn" title="展開/收起格式工具列">Aa</button>
+            </span>
+          </div>
+
+          <div class="format-toolbar" id="formatToolbar">
+            <div class="heading-dropdown-wrap">
+              <button class="format-btn text-icon" id="heading-btn" title="標題">H<span
+                  style="font-size:9px;">▾</span></button>
+              <div class="heading-dropdown" id="headingDropdown">
+                <button class="heading-item" data-level="1"><span class="h-num">#</span> 標題 1</button>
+                <button class="heading-item" data-level="2"><span class="h-num">##</span> 標題 2</button>
+                <button class="heading-item" data-level="3"><span class="h-num">###</span> 標題 3</button>
+                <button class="heading-item" data-level="4"><span class="h-num">####</span> 標題 4</button>
+                <button class="heading-item" data-level="5"><span class="h-num">#####</span> 標題 5</button>
+                <button class="heading-item" data-level="6"><span class="h-num">######</span> 標題 6</button>
+              </div>
+            </div>
+            <button class="format-btn text-icon" data-action="bold" title="粗體 (Ctrl+B)">B</button>
+            <button class="format-btn italic-icon" data-action="italic" title="斜體 (Ctrl+I)">I</button>
+            <button class="format-btn strike-icon" data-action="strike" title="刪除線">S</button>
+            <button class="format-btn" data-action="inline-code" title="行內程式碼">&lt;/&gt;</button>
+            <button class="format-btn" data-action="codeblock" title="程式碼區塊">{ }</button>
+            <button class="format-btn" data-action="link" title="連結">🔗</button>
+            <button class="format-btn" data-action="image" title="圖片">🖼</button>
+            <button class="format-btn" data-action="quote" title="引用">&gt;</button>
+            <button class="format-btn" data-action="ul" title="無序清單">•—</button>
+            <button class="format-btn text-icon" data-action="mark" title="高亮">mark</button>
+
+            <div class="heading-dropdown-wrap">
+              <button class="format-btn" id="color-btn" title="文字顏色">A</button>
+              <div class="color-panel" id="colorPanel">
+                <div class="panel-title">文字顏色</div>
+                <div class="color-grid" id="colorGrid"></div>
+                <div class="custom-row">
+                  <label>自訂</label>
+                  <input type="color" id="customColor" value="#ff0000">
+                </div>
+              </div>
+            </div>
+
+            <div class="heading-dropdown-wrap">
+              <button class="format-btn" id="bgcolor-btn" title="背景色">▦</button>
+              <div class="color-panel" id="bgColorPanel">
+                <div class="panel-title">背景色</div>
+                <div class="color-grid" id="bgColorGrid"></div>
+                <div class="custom-row">
+                  <label>自訂</label>
+                  <input type="color" id="customBgColor" value="#ffeb3b">
+                </div>
+              </div>
+            </div>
+
+            <span class="format-btn sep"></span>
+            <button class="format-btn" data-action="hr" title="分隔線">—</button>
+            <button class="format-btn" data-action="br" title="換行 &lt;br&gt;">↵</button>
+          </div>
+
+          <textarea id="markdown-input" class="wrap"
+            placeholder="在這裡輸入 Markdown 內容...&#10;&#10;點右上角「Aa」展開格式工具列"></textarea>
+        </div>
+
+        <div class="divider" id="divider" title="拖曳調整大小"></div>
+
+        <div class="preview-panel panel-flex" id="previewPanel">
+          <div class="panel-header">
+            <span class="title">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+              </svg>
+              <span id="preview-title">預覽效果</span>
+            </span>
+          </div>
+          <div class="preview-content" id="previewContent">
+            <div id="preview" class="markdown-body wrap-mode"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="printArea"></div>
+
+  <input type="file" id="file-input" accept=".md,.markdown,.txt,text/markdown" style="display:none">
+  <input type="file" id="image-input" accept="image/*" style="display:none">
+  <input type="file" id="folder-input" webkitdirectory directory multiple style="display:none">
+
+  <div class="modal-overlay" id="linkModal">
+    <div class="modal">
+      <h3>插入連結</h3>
+      <label>顯示文字</label>
+      <input type="text" id="link-text" placeholder="點這裡">
+      <label>網址 (URL)</label>
+      <input type="text" id="link-url" placeholder="https://...">
+      <div class="modal-actions">
+        <button id="link-cancel">取消</button>
+        <button id="link-confirm" class="primary">插入</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="imgModal">
+    <div class="modal">
+      <h3>插入圖片</h3>
+      <label>圖片網址 (URL) 或本機路徑</label>
+      <input type="text" id="img-url" placeholder="https://... 或 ./images/a.png">
+      <label>替代文字 (alt)</label>
+      <input type="text" id="img-alt" placeholder="選填，圖片說明">
+      <div class="modal-actions">
+        <button id="img-cancel">取消</button>
+        <button id="img-confirm" class="primary">插入</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-overlay" id="progressOverlay">
+    <div class="progress-spinner"></div>
+    <div class="progress-text" id="progressText">處理中...</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (function () {
+      const input = document.getElementById('markdown-input');
+      const preview = document.getElementById('preview');
+      const importBtn = document.getElementById('import-btn');
+      const fileInput = document.getElementById('file-input');
+      const imageInput = document.getElementById('image-input');
+      const folderInput = document.getElementById('folder-input');
+      const container = document.getElementById('editorContainer');
+      const sourcePanel = document.getElementById('sourcePanel');
+      const previewPanel = document.getElementById('previewPanel');
+      const divider = document.getElementById('divider');
+      const currentFileName = document.getElementById('currentFileName');
+
+      const openFolderBtn = document.getElementById('open-folder-btn');
+      const openFilesBtn = document.getElementById('open-files-btn');
+      const saveBtn = document.getElementById('save-btn');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarBody = document.getElementById('sidebarBody');
+      const sidebarFooter = document.getElementById('sidebarFooter');
+      const folderNameText = document.getElementById('folderNameText');
+      const fileCount = document.getElementById('fileCount');
+      const modeLabel = document.getElementById('modeLabel');
+
+      const toggleSidebarTopBtn = document.getElementById('toggle-sidebar-top-btn');
+      const collapseSidebarBtn = document.getElementById('collapse-sidebar-btn');
+
+      const fileMenuBtn = document.getElementById('file-menu-btn');
+      const fileMenu = document.getElementById('fileMenu');
+
+      const exportMenuBtn = document.getElementById('export-menu-btn');
+      const exportMenu = document.getElementById('exportMenu');
+      const exportMdBtn = document.getElementById('export-md-btn');
+      const exportHtmlBtn = document.getElementById('export-html-btn');
+      const exportPdfBtn = document.getElementById('export-pdf-btn');
+      const exportPngBtn = document.getElementById('export-png-btn');
+
+      const settingsBtn = document.getElementById('settings-btn');
+      const settingsDropdown = document.getElementById('settingsDropdown');
+      const layoutHorizontalBtn = document.getElementById('layout-horizontal');
+      const layoutVerticalBtn = document.getElementById('layout-vertical');
+      const checkHorizontal = document.getElementById('check-horizontal');
+      const checkVertical = document.getElementById('check-vertical');
+      const toggleWrapBtn = document.getElementById('toggle-wrap');
+      const checkWrap = document.getElementById('check-wrap');
+      const swapBtn = document.getElementById('swap-btn');
+      const toggleThemeBtn = document.getElementById('toggle-theme');
+      const themeLabel = document.getElementById('theme-label');
+
+      const imgModal = document.getElementById('imgModal');
+      const imgUrl = document.getElementById('img-url');
+      const imgAlt = document.getElementById('img-alt');
+      const imgCancel = document.getElementById('img-cancel');
+      const imgConfirm = document.getElementById('img-confirm');
+
+      const linkModal = document.getElementById('linkModal');
+      const linkText = document.getElementById('link-text');
+      const linkUrl = document.getElementById('link-url');
+      const linkCancel = document.getElementById('link-cancel');
+      const linkConfirm = document.getElementById('link-confirm');
+
+      const formatToggleBtn = document.getElementById('format-toggle-btn');
+      const formatToolbar = document.getElementById('formatToolbar');
+      const headingBtn = document.getElementById('heading-btn');
+      const headingDropdown = document.getElementById('headingDropdown');
+      const colorBtn = document.getElementById('color-btn');
+      const colorPanel = document.getElementById('colorPanel');
+      const colorGrid = document.getElementById('colorGrid');
+      const customColor = document.getElementById('customColor');
+      const bgcolorBtn = document.getElementById('bgcolor-btn');
+      const bgColorPanel = document.getElementById('bgColorPanel');
+      const bgColorGrid = document.getElementById('bgColorGrid');
+      const customBgColor = document.getElementById('customBgColor');
+
+      const progressOverlay = document.getElementById('progressOverlay');
+      const progressText = document.getElementById('progressText');
+      const printArea = document.getElementById('printArea');
+
+      const toast = document.getElementById('toast');
+
+      const hljsThemeDark = document.getElementById('hljs-theme-dark');
+      const hljsThemeLight = document.getElementById('hljs-theme-light');
+      const mdThemeDark = document.getElementById('md-theme-dark');
+      const mdThemeLight = document.getElementById('md-theme-light');
+
+      let layout = 'horizontal';
+      let autoWrap = true;
+      let isSwapped = false;
+      let hasDirHandle = typeof window.showDirectoryPicker === 'function';
+      let isLightTheme = false;
+
+      let files = [];
+      let currentFile = null;
+      let dirHandle = null;
+      let readOnlyMode = false;
+      const imageMap = new Map();
+      const imageUrlCache = new Map();
+
+      let toastTimer = null;
+      function showToast(msg, type) {
+        toast.textContent = msg;
+        toast.className = 'toast show' + (type ? ' ' + type : '');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { toast.className = 'toast'; }, 2500);
+      }
+
+      function showProgress(text) {
+        progressText.textContent = text || '處理中...';
+        progressOverlay.classList.add('show');
+      }
+      function hideProgress() {
+        progressOverlay.classList.remove('show');
+      }
+
+      marked.setOptions({
+        gfm: true, breaks: true, sanitize: false,
+        highlight: function (code, lang) {
+          if (lang && hljs.getLanguage(lang)) {
+            try { return hljs.highlight(code, { language: lang }).value; } catch (e) { }
+          }
+          try { return hljs.highlightAuto(code).value; } catch (e) { return code; }
+        }
+      });
+
+      function resolveImages(text) {
+        return text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, path) => {
+          const trimmed = path.trim();
+          if (/^(https?:|data:|img:\/\/)/i.test(trimmed)) return match;
+          const cleanPath = trimmed.split(/\s+/)[0];
+          const normalized = cleanPath.replace(/^\.\//, '');
+          if (imageMap.has(cleanPath) || imageMap.has(normalized)) {
+            const blobUrl = imageMap.get(cleanPath) || imageMap.get(normalized);
+            return '![' + alt + '](' + blobUrl + ')';
+          }
+          const fileName = cleanPath.split('/').pop();
+          for (const [key, value] of imageMap.entries()) {
+            if (key.endsWith('/' + fileName) || key === fileName) {
+              return '![' + alt + '](' + value + ')';
+            }
+          }
+          return match;
+        });
+      }
+
+      function renderMarkdown() {
+        const rawText = input.value;
+        const resolvedText = resolveImages(rawText);
+        if (!resolvedText.trim()) {
+          preview.innerHTML = '<p class="placeholder-hint">開始輸入 Markdown 內容，這裡會即時顯示預覽...</p>';
+          return;
+        }
+        try {
+          let html = marked.parse(resolvedText);
+          html = html.replace(/<img([^>]*?)>/g, function (match, attrs) {
+            return '<img' + attrs + ' onerror="this.classList.add(\'img-error\'); this.alt=\'⚠️ 圖片載入失敗: \' + (this.alt || this.src);">';
+          });
+          preview.innerHTML = html;
+        } catch (error) {
+          preview.innerHTML = '<p style="color: var(--error);">解析錯誤：' + error.message + '</p>';
+        }
+      }
+
+      renderMarkdown();
+
+      let timeoutId = null;
+      input.addEventListener('input', () => {
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => { renderMarkdown(); timeoutId = null; }, 100);
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          const start = input.selectionStart;
+          const end = input.selectionEnd;
+          const tabSpaces = '  ';
+          input.value = input.value.substring(0, start) + tabSpaces + input.value.substring(end);
+          input.selectionStart = input.selectionEnd = start + tabSpaces.length;
+          input.dispatchEvent(new Event('input'));
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+          e.preventDefault();
+          applyWrap('**', '**', 'bold');
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'i') {
+          e.preventDefault();
+          applyWrap('*', '*', 'italic');
+        }
+      });
+
+      function insertAtCursor(text) {
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        input.value = input.value.substring(0, start) + text + input.value.substring(end);
+        input.selectionStart = input.selectionEnd = start + text.length;
+        input.focus();
+        input.dispatchEvent(new Event('input'));
+      }
+
+      function applyWrap(openMark, closeMark, actionName) {
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        const value = input.value;
+
+        if (start === end) {
+          const insertText = openMark + closeMark;
+          input.value = value.substring(0, start) + insertText + value.substring(end);
+          input.selectionStart = input.selectionEnd = start + openMark.length;
+          input.focus();
+          input.dispatchEvent(new Event('input'));
+          return;
+        }
+
+        const selected = value.substring(start, end);
+        const before = value.substring(0, start);
+        const after = value.substring(end);
+
+        if (selected.startsWith(openMark) && selected.endsWith(closeMark) && selected.length >= openMark.length + closeMark.length) {
+          const inner = selected.substring(openMark.length, selected.length - closeMark.length);
+          input.value = before + inner + after;
+          input.selectionStart = start;
+          input.selectionEnd = start + inner.length;
+          input.focus();
+          input.dispatchEvent(new Event('input'));
+          return;
+        }
+
+        if (before.endsWith(openMark) && after.startsWith(closeMark)) {
+          const beforeTrim = before.substring(0, before.length - openMark.length);
+          const afterTrim = after.substring(closeMark.length);
+          input.value = beforeTrim + selected + afterTrim;
+          input.selectionStart = start - openMark.length;
+          input.selectionEnd = end - openMark.length;
+          input.focus();
+          input.dispatchEvent(new Event('input'));
+          return;
+        }
+
+        if (openMark === closeMark) {
+          const startsWithMark = selected.startsWith(openMark);
+          const endsWithMark = selected.endsWith(closeMark);
+          if ((startsWithMark && !endsWithMark) || (!startsWithMark && endsWithMark)) {
+            showToast('選取範圍的樣式不完整，請重新選取', 'error');
+            return;
+          }
+        } else {
+          const hasOpen = selected.includes(openMark);
+          const hasClose = selected.includes(closeMark);
+          if ((hasOpen && !hasClose) || (!hasOpen && hasClose)) {
+            showToast('選取範圍的樣式不完整，請重新選取', 'error');
+            return;
+          }
+        }
+
+        input.value = before + openMark + selected + closeMark + after;
+        input.selectionStart = start + openMark.length;
+        input.selectionEnd = start + openMark.length + selected.length;
+        input.focus();
+        input.dispatchEvent(new Event('input'));
+      }
+
+      function applyLinePrefix(prefix, actionName) {
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        const value = input.value;
+
+        let lineStart = value.lastIndexOf('\n', start - 1) + 1;
+        let lineEnd = value.indexOf('\n', end);
+        if (lineEnd === -1) lineEnd = value.length;
+
+        const block = value.substring(lineStart, lineEnd);
+        const lines = block.split('\n');
+
+        const allHavePrefix = lines.every(line => line.startsWith(prefix));
+
+        let newLines;
+        if (allHavePrefix) {
+          newLines = lines.map(line => line.substring(prefix.length));
+        } else {
+          newLines = lines.map(line => line.startsWith(prefix) ? line : prefix + line);
+        }
+
+        const newBlock = newLines.join('\n');
+        input.value = value.substring(0, lineStart) + newBlock + value.substring(lineEnd);
+
+        const delta = newBlock.length - block.length;
+        input.selectionStart = lineStart;
+        input.selectionEnd = lineEnd + delta;
+        input.focus();
+        input.dispatchEvent(new Event('input'));
+      }
+
+      function applyHeading(level) {
+        const start = input.selectionStart;
+        const value = input.value;
+        let lineStart = value.lastIndexOf('\n', start - 1) + 1;
+        let lineEnd = value.indexOf('\n', start);
+        if (lineEnd === -1) lineEnd = value.length;
+
+        const line = value.substring(lineStart, lineEnd);
+        const match = line.match(/^(#{1,6})\s?(.*)$/);
+
+        let newLine;
+        if (match) {
+          const currentLevel = match[1].length;
+          const content = match[2];
+          if (currentLevel === level) {
+            newLine = content;
+          } else {
+            newLine = '#'.repeat(level) + ' ' + content;
+          }
+        } else {
+          newLine = '#'.repeat(level) + ' ' + line;
+        }
+
+        input.value = value.substring(0, lineStart) + newLine + value.substring(lineEnd);
+        const newCursor = lineStart + newLine.length;
+        input.selectionStart = input.selectionEnd = newCursor;
+        input.focus();
+        input.dispatchEvent(new Event('input'));
+      }
+
+      function applyFormat(action) {
+        switch (action) {
+          case 'bold': applyWrap('**', '**', 'bold'); break;
+          case 'italic': applyWrap('*', '*', 'italic'); break;
+          case 'strike': applyWrap('~~', '~~', 'strike'); break;
+          case 'inline-code': applyWrap('`', '`', 'inline-code'); break;
+          case 'codeblock': applyWrap('```\n', '\n```', 'codeblock'); break;
+          case 'mark': applyWrap('<mark>', '</mark>', 'mark'); break;
+          case 'quote': applyLinePrefix('> ', 'quote'); break;
+          case 'ul': applyLinePrefix('- ', 'ul'); break;
+          case 'hr': insertAtCursor('\n---\n'); break;
+          case 'br': insertAtCursor('<br>'); break;
+          case 'link': openLinkModal(); break;
+          case 'image': openImageModal(); break;
+        }
+      }
+
+      formatToolbar.addEventListener('click', (e) => {
+        const btn = e.target.closest('.format-btn');
+        if (!btn) return;
+        const action = btn.dataset.action;
+        if (action) applyFormat(action);
+      });
+
+      formatToggleBtn.addEventListener('click', () => {
+        const isOpen = formatToolbar.classList.toggle('show');
+        formatToggleBtn.classList.toggle('active', isOpen);
+        closeAllFormatDropdowns();
+      });
+
+      headingBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wasOpen = headingDropdown.classList.contains('open');
+        closeAllFormatDropdowns();
+        if (!wasOpen) headingDropdown.classList.add('open');
+      });
+
+      headingDropdown.addEventListener('click', (e) => {
+        const item = e.target.closest('.heading-item');
+        if (!item) return;
+        const level = parseInt(item.dataset.level, 10);
+        applyHeading(level);
+        headingDropdown.classList.remove('open');
+      });
+
+      const presetColors = [
+        '#ff0000', '#ff6b00', '#ffd93d', '#4ec9b0', '#569cd6',
+        '#c586c0', '#808080', '#ffffff', '#000000', '#8b4513'
+      ];
+      const presetBgColors = [
+        '#ffeb3b', '#ffcdd2', '#c8e6c9', '#bbdefb', '#e1bee7',
+        '#ffe0b2', '#f5f5f5', '#bdbdbd', '#4ec9b0', '#569cd6'
+      ];
+
+      function buildColorGrid(gridEl, colors, isBg) {
+        gridEl.innerHTML = '';
+        colors.forEach(color => {
+          const swatch = document.createElement('div');
+          swatch.className = 'color-swatch';
+          swatch.style.backgroundColor = color;
+          swatch.title = color;
+          swatch.addEventListener('click', () => {
+            applyColor(color, isBg);
+            closeAllFormatDropdowns();
+          });
+          gridEl.appendChild(swatch);
+        });
+      }
+
+      buildColorGrid(colorGrid, presetColors, false);
+      buildColorGrid(bgColorGrid, presetBgColors, true);
+
+      customColor.addEventListener('change', () => {
+        applyColor(customColor.value, false);
+        closeAllFormatDropdowns();
+      });
+      customBgColor.addEventListener('change', () => {
+        applyColor(customBgColor.value, true);
+        closeAllFormatDropdowns();
+      });
+
+      function applyColor(color, isBg) {
+        if (isBg) {
+          applyWrap('<span style="background-color:' + color + '">', '</span>', 'bgcolor');
+        } else {
+          applyWrap('<font color="' + color + '">', '</font>', 'color');
+        }
+      }
+
+      colorBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wasOpen = colorPanel.classList.contains('open');
+        closeAllFormatDropdowns();
+        if (!wasOpen) colorPanel.classList.add('open');
+      });
+
+      bgcolorBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wasOpen = bgColorPanel.classList.contains('open');
+        closeAllFormatDropdowns();
+        if (!wasOpen) bgColorPanel.classList.add('open');
+      });
+
+      colorPanel.addEventListener('click', (e) => e.stopPropagation());
+      bgColorPanel.addEventListener('click', (e) => e.stopPropagation());
+
+      function closeAllFormatDropdowns() {
+        headingDropdown.classList.remove('open');
+        colorPanel.classList.remove('open');
+        bgColorPanel.classList.remove('open');
+      }
+
+      // ===== 主題切換 =====
+      function applyTheme(isLight) {
+        isLightTheme = isLight;
+        if (isLight) {
+          document.body.classList.remove('theme-dark');
+          document.body.classList.add('theme-light');
+          hljsThemeDark.disabled = true;
+          hljsThemeLight.disabled = false;
+          mdThemeDark.disabled = true;
+          mdThemeLight.disabled = false;
+          themeLabel.textContent = '深色模式';
+          document.getElementById('theme-icon').innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+        } else {
+          document.body.classList.remove('theme-light');
+          document.body.classList.add('theme-dark');
+          hljsThemeDark.disabled = false;
+          hljsThemeLight.disabled = true;
+          mdThemeDark.disabled = false;
+          mdThemeLight.disabled = true;
+          themeLabel.textContent = '淺色模式';
+          document.getElementById('theme-icon').innerHTML = '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>';
+        }
+        try { localStorage.setItem('md-editor-theme', isLight ? 'light' : 'dark'); } catch (e) { }
+      }
+
+      toggleThemeBtn.addEventListener('click', () => {
+        applyTheme(!isLightTheme);
+        closeAllDropdowns();
+        renderMarkdown();
+      });
+
+      (function initTheme() {
+        try {
+          const saved = localStorage.getItem('md-editor-theme');
+          if (saved === 'light') {
+            applyTheme(true);
+            return;
+          }
+        } catch (e) { }
+        applyTheme(false);
+      })();
+
+      // ===== 連結對話框 =====
+      function openLinkModal() {
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        if (start !== end) {
+          linkText.value = input.value.substring(start, end);
+        } else {
+          linkText.value = '';
+        }
+        linkUrl.value = '';
+        linkModal.classList.add('open');
+        setTimeout(() => (linkText.value ? linkUrl.focus() : linkText.focus()), 50);
+      }
+
+      linkCancel.addEventListener('click', () => linkModal.classList.remove('open'));
+      linkModal.addEventListener('click', (e) => { if (e.target === linkModal) linkModal.classList.remove('open'); });
+
+      linkConfirm.addEventListener('click', () => {
+        const text = linkText.value.trim() || '連結文字';
+        const url = linkUrl.value.trim();
+        if (!url) { showToast('請輸入網址', 'error'); return; }
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        if (start !== end) {
+          const value = input.value;
+          const before = value.substring(0, start);
+          const after = value.substring(end);
+          const insert = '[' + text + '](' + url + ')';
+          input.value = before + insert + after;
+          input.selectionStart = start;
+          input.selectionEnd = start + insert.length;
+        } else {
+          insertAtCursor('[' + text + '](' + url + ')');
+        }
+        input.focus();
+        input.dispatchEvent(new Event('input'));
+        linkModal.classList.remove('open');
+      });
+
+      linkText.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); linkUrl.focus(); } });
+      linkUrl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); linkConfirm.click(); } });
+
+      // ===== 圖片對話框 =====
+      function openImageModal() {
+        imgUrl.value = '';
+        imgAlt.value = '';
+        imgModal.classList.add('open');
+        setTimeout(() => imgUrl.focus(), 50);
+      }
+
+      imgCancel.addEventListener('click', () => imgModal.classList.remove('open'));
+      imgModal.addEventListener('click', (e) => { if (e.target === imgModal) imgModal.classList.remove('open'); });
+      imgUrl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); imgConfirm.click(); } });
+      imgAlt.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); imgConfirm.click(); } });
+
+      imgConfirm.addEventListener('click', () => {
+        const url = imgUrl.value.trim();
+        const alt = imgAlt.value.trim() || '圖片';
+        if (!url) { showToast('請輸入圖片網址', 'error'); return; }
+        insertAtCursor('![' + alt + '](' + url + ')');
+        imgModal.classList.remove('open');
+      });
+
+      (function addLocalImageButton() {
+        const actions = imgModal.querySelector('.modal-actions');
+        const localBtn = document.createElement('button');
+        localBtn.textContent = '從本機選擇';
+        localBtn.type = 'button';
+        localBtn.style.marginRight = 'auto';
+        localBtn.addEventListener('click', () => imageInput.click());
+        actions.insertBefore(localBtn, actions.firstChild);
+      })();
+
+      imageInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+          showToast('請選擇圖片檔案', 'error');
+          imageInput.value = '';
+          return;
+        }
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+          if (!confirm('這張圖片超過 5MB，轉成 Base64 會讓檔案變很大。確定要繼續嗎？')) {
+            imageInput.value = '';
+            return;
+          }
+        }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const base64 = ev.target.result;
+          const alt = file.name.replace(/\.[^.]+$/, '') || '圖片';
+          insertAtCursor('\n![' + alt + '](' + base64 + ')\n');
+          imgModal.classList.remove('open');
+        };
+        reader.onerror = () => showToast('圖片讀取失敗', 'error');
+        reader.readAsDataURL(file);
+        imageInput.value = '';
+      });
+
+      // ===== 檔案清單 =====
+      function renderFileList() {
+        if (files.length === 0) {
+          sidebarBody.innerHTML = '<div class="sidebar-empty">資料夾裡沒有可編輯的檔案</div>';
+          return;
+        }
+        const ul = document.createElement('ul');
+        ul.className = 'file-list';
+        files.forEach((f) => {
+          const li = document.createElement('li');
+          li.className = 'file-item' + (currentFile && currentFile.path === f.path ? ' active' : '');
+          li.title = f.path;
+          const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          icon.setAttribute('viewBox', '0 0 24 24');
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('d', 'M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z');
+          icon.appendChild(path);
+          li.appendChild(icon);
+          const name = document.createElement('span');
+          name.textContent = f.name;
+          name.style.overflow = 'hidden';
+          name.style.textOverflow = 'ellipsis';
+          name.style.whiteSpace = 'nowrap';
+          li.appendChild(name);
+          li.addEventListener('click', () => openFile(f));
+          ul.appendChild(li);
+        });
+        sidebarBody.innerHTML = '';
+        sidebarBody.appendChild(ul);
+      }
+
+      function updateSidebarFooter() {
+        if (files.length === 0) {
+          sidebarFooter.style.display = 'none';
+        } else {
+          sidebarFooter.style.display = 'flex';
+          fileCount.textContent = files.length + ' 個檔案';
+          modeLabel.textContent = readOnlyMode ? '唯讀模式' : '完整模式';
+          modeLabel.style.color = readOnlyMode ? '#dcb67a' : 'var(--success)';
+        }
+      }
+
+      async function openFile(file) {
+        currentFile = file;
+        currentFileName.textContent = file.name;
+        saveBtn.disabled = readOnlyMode || !file.handle;
+        try {
+          let content;
+          if (file.handle) {
+            const f = await file.handle.getFile();
+            content = await f.text();
+          } else if (file.content !== undefined) {
+            content = file.content;
+          } else {
+            throw new Error('無法讀取檔案內容');
+          }
+          input.value = content;
+          input.setSelectionRange(0, 0);
+          input.scrollTop = 0;
+          renderMarkdown();
+          renderFileList();
+          input.focus();
+        } catch (err) {
+          showToast('讀取檔案失敗：' + err.message, 'error');
+        }
+      }
+
+      function toggleSidebar() {
+        sidebar.classList.toggle('collapsed');
+      }
+
+      toggleSidebarTopBtn.addEventListener('click', toggleSidebar);
+      collapseSidebarBtn.addEventListener('click', toggleSidebar);
+
+      function showSidebar() {
+        sidebar.classList.remove('collapsed');
+      }
+
+      // ===== 下拉選單 =====
+      function closeAllDropdowns() {
+        fileMenu.classList.remove('open');
+        exportMenu.classList.remove('open');
+        settingsDropdown.classList.remove('open');
+      }
+
+      fileMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wasOpen = fileMenu.classList.contains('open');
+        closeAllDropdowns();
+        if (!wasOpen) fileMenu.classList.add('open');
+      });
+
+      exportMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wasOpen = exportMenu.classList.contains('open');
+        closeAllDropdowns();
+        if (!wasOpen) exportMenu.classList.add('open');
+      });
+
+      settingsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wasOpen = settingsDropdown.classList.contains('open');
+        closeAllDropdowns();
+        if (!wasOpen) settingsDropdown.classList.add('open');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!fileMenu.contains(e.target) && e.target !== fileMenuBtn) {
+          fileMenu.classList.remove('open');
+        }
+        if (!exportMenu.contains(e.target) && e.target !== exportMenuBtn) {
+          exportMenu.classList.remove('open');
+        }
+        if (!settingsDropdown.contains(e.target) && e.target !== settingsBtn) {
+          settingsDropdown.classList.remove('open');
+        }
+        if (!headingDropdown.contains(e.target) && e.target !== headingBtn) {
+          headingDropdown.classList.remove('open');
+        }
+        if (!colorPanel.contains(e.target) && e.target !== colorBtn) {
+          colorPanel.classList.remove('open');
+        }
+        if (!bgColorPanel.contains(e.target) && e.target !== bgcolorBtn) {
+          bgColorPanel.classList.remove('open');
+        }
+      });
+
+      fileMenu.addEventListener('click', (e) => e.stopPropagation());
+      exportMenu.addEventListener('click', (e) => e.stopPropagation());
+      settingsDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+      // ===== 打開資料夾 =====
+      if (hasDirHandle) {
+        openFolderBtn.addEventListener('click', async () => {
+          closeAllDropdowns();
+          try {
+            dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            await loadDirectoryFromHandle(dirHandle);
+            readOnlyMode = false;
+            folderNameText.textContent = dirHandle.name;
+            showSidebar();
+            updateSidebarFooter();
+            showToast('已開啟資料夾：' + dirHandle.name, 'success');
+          } catch (err) {
+            if (err.name !== 'AbortError') {
+              showToast('開啟資料夾失敗：' + err.message, 'error');
+            }
+          }
+        });
+      } else {
+        openFolderBtn.addEventListener('click', () => {
+          closeAllDropdowns();
+          showToast('此瀏覽器不支援資料夾模式，請改用「選擇多個檔案」', 'error');
+        });
+        openFolderBtn.disabled = true;
+      }
+
+      async function loadDirectoryFromHandle(handle) {
+        files = [];
+        imageMap.clear();
+        for (const url of imageUrlCache.values()) URL.revokeObjectURL(url);
+        imageUrlCache.clear();
+        await scanDirectory(handle, '');
+        files.sort((a, b) => a.path.localeCompare(b.path));
+        renderFileList();
+        updateSidebarFooter();
+      }
+
+      async function scanDirectory(handle, path) {
+        for await (const entry of handle.values()) {
+          const entryPath = path ? path + '/' + entry.name : entry.name;
+          if (entry.kind === 'file') {
+            const lower = entry.name.toLowerCase();
+            if (/\.(md|markdown|txt)$/.test(lower)) {
+              files.push({ name: entry.name, path: entryPath, handle: entry, type: 'md' });
+            } else if (/\.(png|jpe?g|gif|webp|svg|bmp|ico)$/.test(lower)) {
+              try {
+                const file = await entry.getFile();
+                const blobUrl = URL.createObjectURL(file);
+                imageUrlCache.set(entryPath, blobUrl);
+                imageMap.set(entryPath, blobUrl);
+                if (!imageMap.has(entry.name)) imageMap.set(entry.name, blobUrl);
+              } catch (e) {
+                console.warn('載入圖片失敗:', entryPath, e);
+              }
+            }
+          } else if (entry.kind === 'directory') {
+            await scanDirectory(entry, entryPath);
+          }
+        }
+      }
+
+      openFilesBtn.addEventListener('click', () => {
+        closeAllDropdowns();
+        folderInput.click();
+      });
+
+      folderInput.addEventListener('change', async (e) => {
+        const fileList = Array.from(e.target.files || []);
+        if (fileList.length === 0) return;
+        files = [];
+        imageMap.clear();
+        for (const url of imageUrlCache.values()) URL.revokeObjectURL(url);
+        imageUrlCache.clear();
+        let rootName = '已選擇的檔案';
+        if (fileList[0].webkitRelativePath) {
+          const first = fileList[0].webkitRelativePath;
+          rootName = first.split('/')[0] || '已選擇的檔案';
+        }
+        for (const f of fileList) {
+          const path = f.webkitRelativePath || f.name;
+          const lower = f.name.toLowerCase();
+          if (/\.(md|markdown|txt)$/.test(lower)) {
+            const content = await f.text();
+            files.push({ name: f.name, path: path, handle: null, content: content, type: 'md' });
+          } else if (/\.(png|jpe?g|gif|webp|svg|bmp|ico)$/.test(lower)) {
+            const blobUrl = URL.createObjectURL(f);
+            imageUrlCache.set(path, blobUrl);
+            imageMap.set(path, blobUrl);
+            const relativePath = path.replace(/^[^/]+\//, '');
+            if (relativePath !== path) imageMap.set(relativePath, blobUrl);
+            if (!imageMap.has(f.name)) imageMap.set(f.name, blobUrl);
+          }
+        }
+        readOnlyMode = true;
+        dirHandle = null;
+        folderNameText.textContent = rootName;
+        showSidebar();
+        files.sort((a, b) => a.path.localeCompare(b.path));
+        renderFileList();
+        updateSidebarFooter();
+        if (files.length === 0) {
+          showToast('選的資料夾裡沒有 .md / .txt 檔', 'error');
+        } else {
+          showToast('已載入 ' + files.length + ' 個檔案（唯讀模式）', 'success');
+        }
+        folderInput.value = '';
+      });
+
+      // ===== 儲存（按鈕 + Ctrl+S / Cmd+S）=====
+      async function saveCurrentFile() {
+        if (!currentFile) {
+          showToast('請先開啟一個檔案', 'error');
+          return;
+        }
+        if (readOnlyMode || !currentFile.handle) {
+          showToast('唯讀模式無法儲存，請用「導出」下載', 'error');
+          return;
+        }
+        try {
+          const writable = await currentFile.handle.createWritable();
+          await writable.write(input.value);
+          await writable.close();
+          showToast('已儲存：' + currentFile.name, 'success');
+        } catch (err) {
+          showToast('儲存失敗：' + err.message, 'error');
+        }
+      }
+
+      saveBtn.addEventListener('click', saveCurrentFile);
+
+      // ★ 全域攔截 Ctrl+S / Cmd+S
+      document.addEventListener('keydown', (e) => {
+        // Ctrl+S（Windows/Linux）或 Cmd+S（Mac）
+        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 's') {
+          e.preventDefault(); // 攔截瀏覽器預設的「儲存網頁」
+          e.stopPropagation();
+          saveCurrentFile();
+        }
+      }, true); // 用 capture 階段，比 input 的 keydown 更早攔截
+
+      importBtn.addEventListener('click', () => {
+        closeAllDropdowns();
+        fileInput.click();
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          input.value = ev.target.result;
+          input.scrollTop = 0;
+          currentFileName.textContent = file.name;
+          currentFile = null;
+          saveBtn.disabled = true;
+          renderMarkdown();
+          input.focus();
+        };
+        reader.onerror = () => showToast('檔案讀取失敗', 'error');
+        reader.readAsText(file, 'UTF-8');
+        fileInput.value = '';
+      });
+
+      // ===== 導出功能 =====
+      exportMdBtn.addEventListener('click', () => {
+        closeAllDropdowns();
+        const content = input.value;
+        if (!content.trim()) { showToast('目前沒有內容可以導出', 'error'); return; }
+        const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+        downloadBlob(blob, getBaseName() + '.md');
+      });
+
+      exportHtmlBtn.addEventListener('click', async () => {
+        closeAllDropdowns();
+        const content = input.value;
+        if (!content.trim()) { showToast('目前沒有內容可以導出', 'error'); return; }
+
+        showProgress('正在處理圖片...');
+        try {
+          const htmlContent = await generateStandaloneHtml();
+          const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+          downloadBlob(blob, getBaseName() + '.html');
+          showToast('已導出 HTML', 'success');
+        } catch (err) {
+          console.error(err);
+          showToast('導出失敗：' + err.message, 'error');
+        } finally {
+          hideProgress();
+        }
+      });
+
+      exportPdfBtn.addEventListener('click', () => {
+        closeAllDropdowns();
+        const content = input.value;
+        if (!content.trim()) { showToast('目前沒有內容可以導出', 'error'); return; }
+        const previewHtml = preview.innerHTML;
+        printArea.innerHTML = previewHtml;
+        setTimeout(() => { window.print(); }, 100);
+        showToast('在列印對話框選「另存為 PDF」', 'success');
+      });
+
+      exportPngBtn.addEventListener('click', async () => {
+        closeAllDropdowns();
+        const content = input.value;
+        if (!content.trim()) { showToast('目前沒有內容可以導出', 'error'); return; }
+
+        showProgress('載入截圖工具...');
+        try {
+          await loadHtml2Canvas();
+          showProgress('產生圖片中...');
+
+          const previewContent = document.getElementById('previewContent');
+          const originalOverflow = previewContent.style.overflow;
+          const originalHeight = previewContent.style.height;
+          const originalMaxHeight = previewContent.style.maxHeight;
+          previewContent.style.overflow = 'visible';
+          previewContent.style.height = 'auto';
+          previewContent.style.maxHeight = 'none';
+
+          await new Promise(r => setTimeout(r, 50));
+
+          const isLight = document.body.classList.contains('theme-light');
+          const canvas = await html2canvas(preview, {
+            backgroundColor: isLight ? '#ffffff' : '#1e1e1e',
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+            windowWidth: preview.scrollWidth,
+            windowHeight: preview.scrollHeight
+          });
+
+          previewContent.style.overflow = originalOverflow;
+          previewContent.style.height = originalHeight;
+          previewContent.style.maxHeight = originalMaxHeight;
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              downloadBlob(blob, getBaseName() + '.png');
+              showToast('已導出 PNG', 'success');
+            } else {
+              showToast('產生圖片失敗', 'error');
+            }
+          }, 'image/png');
+        } catch (err) {
+          console.error(err);
+          showToast('導出失敗：' + err.message, 'error');
+        } finally {
+          hideProgress();
+        }
+      });
+
+      // ===== 輔助函式 =====
+      function getBaseName() {
+        if (currentFile) {
+          return currentFile.name.replace(/\.[^.]+$/, '');
+        }
+        return 'document';
+      }
+
+      function downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      function loadHtml2Canvas() {
+        return new Promise((resolve, reject) => {
+          if (window.html2canvas) { resolve(); return; }
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+          script.onload = resolve;
+          script.onerror = () => reject(new Error('無法載入截圖工具'));
+          document.head.appendChild(script);
+        });
+      }
+
+      function blobUrlToBase64(blobUrl) {
+        return new Promise((resolve, reject) => {
+          fetch(blobUrl)
+            .then(res => res.blob())
+            .then(blob => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            })
+            .catch(reject);
+        });
+      }
+
+      async function generateStandaloneHtml() {
+        const previewHtml = preview.innerHTML;
+
+        const blobUrls = [];
+        previewHtml.replace(/src="(blob:[^"]+)"/g, (match, url) => {
+          blobUrls.push(url);
+          return match;
+        });
+
+        let finalHtml = previewHtml;
+        let processed = 0;
+
+        for (const blobUrl of blobUrls) {
+          try {
+            const base64 = await blobUrlToBase64(blobUrl);
+            finalHtml = finalHtml.split(blobUrl).join(base64);
+            processed++;
+            showProgress('處理圖片 ' + processed + ' / ' + blobUrls.length);
+          } catch (err) {
+            console.warn('轉換失敗:', blobUrl, err);
+          }
+        }
+
+        const isLight = document.body.classList.contains('theme-light');
+        const bgColor = isLight ? '#ffffff' : '#1e1e1e';
+        const textColor = isLight ? '#24292e' : '#d4d4d4';
+        const hColor = isLight ? '#1a1a1a' : '#e0e0e0';
+        const borderColor = isLight ? '#e1e4e8' : '#3c3c3c';
+        const linkColor = isLight ? '#0366d6' : '#569cd6';
+        const codeBg = isLight ? '#f6f8fa' : '#2d2d2d';
+        const blockquoteColor = isLight ? '#6a737d' : '#a0a0a0';
+        const tableBg = isLight ? '#f6f8fa' : '#252526';
+        const tableBorder = isLight ? '#dfe2e5' : '#3c3c3c';
+        const markBg = isLight ? '#fff5b1' : '#ffd93d';
+        const markText = isLight ? '#24292e' : '#1e1e1e';
+
+        const styles = `
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+        background-color: ${bgColor};
+        color: ${textColor};
+        padding: 40px 20px;
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+      }
+      .container { max-width: 900px; margin: 0 auto; }
+      h1, h2, h3, h4, h5, h6 { color: ${hColor}; margin: 1.2em 0 0.6em; font-weight: 600; }
+      h1 { font-size: 2em; border-bottom: 1px solid ${borderColor}; padding-bottom: 0.3em; }
+      h2 { font-size: 1.5em; border-bottom: 1px solid ${borderColor}; padding-bottom: 0.3em; }
+      h3 { font-size: 1.25em; }
+      p { margin: 0.8em 0; }
+      a { color: ${linkColor}; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      code {
+        background-color: ${codeBg};
+        color: ${textColor};
+        padding: 0.2em 0.4em;
+        border-radius: 4px;
+        font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+        font-size: 0.9em;
+      }
+      pre {
+        background-color: ${codeBg};
+        border-radius: 6px;
+        padding: 16px;
+        overflow-x: auto;
+        border: 1px solid ${borderColor};
+        margin: 1em 0;
+      }
+      pre code { background-color: transparent; padding: 0; font-size: 0.9em; line-height: 1.5; }
+      blockquote { border-left: 4px solid ${borderColor}; padding-left: 16px; margin: 1em 0; color: ${blockquoteColor}; }
+      ul, ol { padding-left: 2em; margin: 0.8em 0; }
+      li { margin: 0.3em 0; }
+      table { border-collapse: collapse; margin: 1em 0; width: auto; max-width: 100%; overflow-x: auto; display: block; }
+      table th, table td { border: 1px solid ${tableBorder}; padding: 6px 13px; }
+      table th { background-color: ${codeBg}; font-weight: 600; }
+      table tr:nth-child(2n) { background-color: ${tableBg}; }
+      hr { border: none; border-top: 1px solid ${borderColor}; margin: 1.5em 0; }
+      img { max-width: 100%; height: auto; display: block; margin: 12px 0; border-radius: 6px; border: 1px solid ${borderColor}; }
+      mark { background-color: ${markBg}; color: ${markText}; padding: 0.1em 0.3em; border-radius: 3px; }
+      .hljs { color: #abb2bf; background: #282c34; }
+      .hljs-comment, .hljs-quote { color: #5c6370; font-style: italic; }
+      .hljs-doctag, .hljs-keyword, .hljs-formula { color: #c678dd; }
+      .hljs-section, .hljs-name, .hljs-selector-tag, .hljs-deletion, .hljs-subst { color: #e06c75; }
+      .hljs-literal { color: #56b6c2; }
+      .hljs-string, .hljs-regexp, .hljs-addition, .hljs-attribute, .hljs-meta .hljs-string { color: #98c379; }
+      .hljs-attr, .hljs-variable, .hljs-template-variable, .hljs-type, .hljs-selector-class, .hljs-selector-attr, .hljs-selector-pseudo, .hljs-number { color: #d19a66; }
+      .hljs-symbol, .hljs-bullet, .hljs-link, .hljs-meta, .hljs-selector-id, .hljs-title { color: #61aeee; }
+      .hljs-built_in, .hljs-title.class_, .hljs-class .hljs-title { color: #e6c07b; }
+      .hljs-emphasis { font-style: italic; }
+      .hljs-strong { font-weight: bold; }
+    `;
+
+        return `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(getBaseName())}</title>
+<style>${styles}</style>
+</head>
+<body>
+<div class="container">
+${finalHtml}
+</div>
+</body>
+</html>`;
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      // ===== Flex 角色 =====
+      function applyFlexRoles() {
+        const prev = divider.previousElementSibling;
+        const next = divider.nextElementSibling;
+        if (prev) { prev.classList.add('panel-fixed'); prev.classList.remove('panel-flex'); }
+        if (next) { next.classList.add('panel-flex'); next.classList.remove('panel-fixed'); }
+      }
+
+      function updateTitles() {
+        const sourceTitleEl = sourcePanel.querySelector('.title > span:not(.file-name)');
+        const previewTitleEl = previewPanel.querySelector('.title > span:not(.file-name)');
+        if (sourceTitleEl) sourceTitleEl.textContent = 'Markdown 源碼';
+        if (previewTitleEl) previewTitleEl.textContent = '預覽效果';
+      }
+
+      let isResizing = false;
+      let startCoord = 0;
+      let startSize = 0;
+      let targetPanel = null;
+
+      function getContainerSize() {
+        const rect = container.getBoundingClientRect();
+        return layout === 'horizontal' ? rect.width : rect.height;
+      }
+      function getDividerSize() {
+        const rect = divider.getBoundingClientRect();
+        return layout === 'horizontal' ? rect.width : rect.height;
+      }
+      function getPanelSize(panel) {
+        const rect = panel.getBoundingClientRect();
+        return layout === 'horizontal' ? rect.width : rect.height;
+      }
+
+      function startResize(coord) {
+        let prev = divider.previousElementSibling;
+        if (!prev) return;
+        targetPanel = prev;
+        isResizing = true;
+        startCoord = coord;
+        startSize = getPanelSize(targetPanel);
+        divider.classList.add('active');
+        document.body.classList.add('resizing');
+        container.classList.add('resizing');
+      }
+
+      function doResize(coord) {
+        if (!isResizing || !targetPanel) return;
+        const total = getContainerSize();
+        const dividerSize = getDividerSize();
+        const minSize = 100;
+        const delta = coord - startCoord;
+        let newSize = startSize + delta;
+        if (newSize < minSize) newSize = minSize;
+        if (newSize > total - dividerSize - minSize) newSize = total - dividerSize - minSize;
+        if (layout === 'horizontal') {
+          targetPanel.style.width = newSize + 'px';
+          targetPanel.style.height = '';
+        } else {
+          targetPanel.style.height = newSize + 'px';
+          targetPanel.style.width = '';
+        }
+      }
+
+      function stopResize() {
+        if (!isResizing) return;
+        isResizing = false;
+        targetPanel = null;
+        divider.classList.remove('active');
+        document.body.classList.remove('resizing');
+        container.classList.remove('resizing');
+      }
+
+      function getCoord(e) {
+        if (e.touches && e.touches.length > 0) {
+          return layout === 'horizontal' ? e.touches[0].clientX : e.touches[0].clientY;
+        }
+        return layout === 'horizontal' ? e.clientX : e.clientY;
+      }
+
+      divider.addEventListener('mousedown', (e) => { e.preventDefault(); startResize(getCoord(e)); });
+      window.addEventListener('mousemove', (e) => { if (isResizing) { e.preventDefault(); doResize(getCoord(e)); } });
+      window.addEventListener('mouseup', stopResize);
+      divider.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) { e.preventDefault(); startResize(getCoord(e)); }
+      }, { passive: false });
+      window.addEventListener('touchmove', (e) => {
+        if (isResizing && e.touches.length === 1) { e.preventDefault(); doResize(getCoord(e)); }
+      }, { passive: false });
+      window.addEventListener('touchend', stopResize);
+      window.addEventListener('touchcancel', stopResize);
+
+      function setLayout(newLayout) {
+        layout = newLayout;
+        container.classList.remove('horizontal', 'vertical');
+        container.classList.add(layout);
+        sourcePanel.style.width = '';
+        sourcePanel.style.height = '';
+        previewPanel.style.width = '';
+        previewPanel.style.height = '';
+        applyFlexRoles();
+        if (layout === 'horizontal') {
+          const fixedPanel = divider.previousElementSibling;
+          if (fixedPanel) fixedPanel.style.width = '50%';
+          checkHorizontal.style.visibility = 'visible';
+          checkVertical.style.visibility = 'hidden';
+        } else {
+          const fixedPanel = divider.previousElementSibling;
+          if (fixedPanel) fixedPanel.style.height = '50%';
+          checkHorizontal.style.visibility = 'hidden';
+          checkVertical.style.visibility = 'visible';
+        }
+      }
+
+      layoutHorizontalBtn.addEventListener('click', () => { setLayout('horizontal'); closeAllDropdowns(); });
+      layoutVerticalBtn.addEventListener('click', () => { setLayout('vertical'); closeAllDropdowns(); });
+
+      function setAutoWrap(enabled) {
+        autoWrap = enabled;
+        if (enabled) {
+          input.classList.remove('nowrap');
+          input.classList.add('wrap');
+          preview.classList.remove('nowrap-mode');
+          preview.classList.add('wrap-mode');
+          checkWrap.style.visibility = 'visible';
+        } else {
+          input.classList.remove('wrap');
+          input.classList.add('nowrap');
+          preview.classList.remove('wrap-mode');
+          preview.classList.add('nowrap-mode');
+          checkWrap.style.visibility = 'hidden';
+        }
+      }
+
+      toggleWrapBtn.addEventListener('click', () => { setAutoWrap(!autoWrap); closeAllDropdowns(); });
+
+      swapBtn.addEventListener('click', () => {
+        isSwapped = !isSwapped;
+        sourcePanel.style.width = '';
+        sourcePanel.style.height = '';
+        previewPanel.style.width = '';
+        previewPanel.style.height = '';
+        if (isSwapped) {
+          container.appendChild(previewPanel);
+          container.appendChild(divider);
+          container.appendChild(sourcePanel);
+        } else {
+          container.appendChild(sourcePanel);
+          container.appendChild(divider);
+          container.appendChild(previewPanel);
+        }
+        updateTitles();
+        applyFlexRoles();
+        const fixedPanel = divider.previousElementSibling;
+        if (fixedPanel) {
+          if (layout === 'horizontal') fixedPanel.style.width = '50%';
+          else fixedPanel.style.height = '50%';
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        const fixedPanel = divider.previousElementSibling;
+        if (!fixedPanel) return;
+        const current = getPanelSize(fixedPanel);
+        if (!current) return;
+        const total = getContainerSize();
+        const dividerSize = getDividerSize();
+        const minSize = 100;
+        let newSize = current;
+        if (newSize > total - dividerSize - minSize) newSize = total - dividerSize - minSize;
+        if (newSize < minSize) newSize = minSize;
+        if (layout === 'horizontal') fixedPanel.style.width = newSize + 'px';
+        else fixedPanel.style.height = newSize + 'px';
+      });
+
+      setLayout('horizontal');
+      setAutoWrap(true);
+      updateTitles();
+
+      if (!hasDirHandle) {
+        openFolderBtn.title = '此瀏覽器不支援資料夾模式，請用「選擇多個檔案」';
+      }
+
+      console.log('%c💡 Ctrl+S / Cmd+S 儲存檔案（需先開啟資料夾）', 'color: #569cd6; font-size: 13px;');
+    })();
+    // 註冊 Service Worker 實現 PWA 離線功能
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => console.log('PWA 註冊成功！', registration.scope))
+          .catch(err => console.log('PWA 註冊失敗：', err));
+      });
+    }
+  </script>
+</body>
+
+</html>
