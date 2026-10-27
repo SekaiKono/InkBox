@@ -1,5 +1,5 @@
 {
-  "name": "墨盒．InkBox 雙屏編輯．即時預覽",
+  "name": "墨盒InkBox",
   "short_name": "墨盒",
   "description": "一款仿Vscode的雙屏Markdown編輯器，全平台通用",
   "start_url": "./index.html", 
