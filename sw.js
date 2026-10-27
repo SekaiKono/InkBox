@@ -1,11 +1,10 @@
-const CACHE_NAME = 'md-editor-v1';
+const CACHE_NAME = 'v1.0.1';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
-  // 如果你有把 CDN 的 js/css 下載到本地，也要在這裡加上路徑
 ];
 
 self.addEventListener('install', (e) => {
