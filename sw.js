@@ -1,10 +1,12 @@
-const CACHE_NAME = 'v1.0.2';
+const CACHE_NAME = 'v1.0.2hotfix';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  './images/icon-512.png',
+  './images/icon-192.png',
+  './images/icon-maskable-512.png',
+  './images/icon-maskable-192.png'
 ];
 
 self.addEventListener('install', (e) => {
