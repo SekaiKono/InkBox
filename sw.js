@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v1.0.2hotfix';
+const CACHE_NAME = 'v1.0.2hotfix2';
 const ASSETS = [
   './',
   './index.html',
