@@ -793,6 +793,76 @@
       letter-spacing: 0.5px;
     }
 
+    /* ===== 插入表格面板 ===== */
+    .table-picker {
+      position: absolute;
+      top: 32px;
+      left: 0;
+      background-color: var(--bg-dropdown);
+      border: 1px solid var(--border-dropdown);
+      border-radius: 6px;
+      padding: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      display: none;
+      z-index: 300;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .table-picker.open {
+      display: flex;
+    }
+
+    .table-picker-header {
+      font-size: 13px;
+      color: var(--text-main);
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .table-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+    }
+
+    .table-grid-cell {
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--border-input);
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background-color 0.1s, border-color 0.1s;
+    }
+
+    .table-grid-cell:hover,
+    .table-grid-cell.active {
+      background-color: var(--accent);
+      border-color: var(--accent-border);
+    }
+
+    .table-picker-footer {
+      border-top: 1px solid var(--border-main);
+      padding-top: 8px;
+      text-align: center;
+    }
+
+    .table-picker-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-link);
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .table-picker-btn:hover {
+      background-color: var(--bg-btn);
+    }
+
     #markdown-input {
       flex: 1;
       width: 100%;
@@ -1219,6 +1289,107 @@
       background-color: var(--accent-hover);
     }
 
+    /* ===== 閱讀模式 ===== */
+    .reading-mode-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background-color: var(--bg-btn);
+      color: var(--text-main);
+      border: 1px solid var(--border-input);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background-color 0.15s;
+    }
+
+    .reading-mode-btn:hover {
+      background-color: var(--bg-btn-hover);
+    }
+
+    .reading-mode-btn svg {
+      width: 13px;
+      height: 13px;
+      fill: currentColor;
+    }
+
+    /* 退出閱讀模式的浮動按鈕 */
+    .exit-reading-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--bg-btn);
+      color: var(--text-main);
+      border: 1px solid var(--border-main);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .exit-reading-btn:hover {
+      background-color: var(--bg-btn-hover);
+      transform: translateY(-2px);
+    }
+
+    .exit-reading-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    /* 當進入閱讀模式時，隱藏特定元素 */
+    body.reading-mode .sidebar,
+    body.reading-mode .source-panel,
+    body.reading-mode .divider,
+    body.reading-mode .topbar .left-group,
+    body.reading-mode .topbar .top-actions,
+    body.reading-mode #currentFileName {
+      display: none !important;
+    }
+
+    /* 讓預覽區佔滿整個畫面 */
+    body.reading-mode .topbar {
+      display: none !important;
+    }
+
+    body.reading-mode .app {
+      height: 100vh;
+    }
+
+    body.reading-mode .main-area {
+      height: 100vh;
+    }
+
+    body.reading-mode .preview-panel {
+      border: none;
+    }
+
+    body.reading-mode .preview-content {
+      padding: 60px 20% 120px 20%;
+      /* 增加左右留白，閱讀更舒適 */
+    }
+
+    /* 手機版的閱讀留白 */
+    @media (max-width: 768px) {
+      body.reading-mode .preview-content {
+        padding: 60px 20px 120px 20px;
+      }
+    }
+
+    body.reading-mode .exit-reading-btn {
+      display: flex;
+    }
+
     /* 通知 toast */
     .toast {
       position: fixed;
@@ -1384,11 +1555,21 @@
           </svg>
           <span class="btn-label">導出</span>
         </button>
+        <!-- 👇 新增：閱讀模式按鈕 -->
+        <button class="btn" id="reading-mode-btn" title="開啟閱讀模式">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
+          </svg>
+          <span class="btn-label">閱讀</span>
+        </button>
+        <!-- 👆 新增結束 -->
         <button class="btn" id="swap-btn" title="交換左右區域">
           <svg viewBox="0 0 24 24">
             <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z" />
           </svg>
           <span class="btn-label">交換</span>
+
         </button>
         <button class="btn" id="settings-btn" title="設定">
           <svg viewBox="0 0 24 24">
@@ -1573,6 +1754,22 @@
             <button class="format-btn" data-action="codeblock" title="程式碼區塊">{ }</button>
             <button class="format-btn" data-action="link" title="連結">🔗</button>
             <button class="format-btn" data-action="image" title="圖片">🖼</button>
+            <!-- 👇 新增：插入表格按鈕與面板 -->
+            <div class="heading-dropdown-wrap">
+              <button class="format-btn" id="table-btn" title="插入表格">
+                <svg viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+                  <path d="M3 3h18v18H3V3zm2 2v4h14V5H5zm0 6v4h14v-4H5zm0 6v2h14v-2H5z" fill="currentColor" />
+                </svg>
+              </button>
+              <div class="table-picker" id="tablePicker">
+                <div class="table-picker-header" id="tablePickerSize">0 x 0</div>
+                <div class="table-grid" id="tableGrid"></div>
+                <div class="table-picker-footer">
+                  <button class="table-picker-btn" id="open-custom-table">自訂大小...</button>
+                </div>
+              </div>
+            </div>
+            <!-- 👆 新增結束 -->
             <button class="format-btn" data-action="quote" title="引用">&gt;</button>
             <button class="format-btn" data-action="ul" title="無序清單">•—</button>
             <button class="format-btn text-icon" data-action="mark" title="高亮">mark</button>
@@ -1663,13 +1860,36 @@
       </div>
     </div>
   </div>
-
+  <!-- 👇 新增：自訂表格大小對話框 -->
+  <div class="modal-overlay" id="tableModal">
+    <div class="modal">
+      <h3>插入表格</h3>
+      <label>欄數 (橫向)</label>
+      <input type="number" id="table-cols" placeholder="例如：3" min="1" max="20" value="3"
+        style="width: 100%; background-color: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-input); border-radius: 4px; padding: 6px 8px; font-size: 13px; outline: none;">
+      <label>列數 (豎向)</label>
+      <input type="number" id="table-rows" placeholder="例如：3" min="1" max="50" value="3"
+        style="width: 100%; background-color: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-input); border-radius: 4px; padding: 6px 8px; font-size: 13px; outline: none;">
+      <div class="modal-actions">
+        <button id="table-cancel">取消</button>
+        <button id="table-confirm" class="primary">插入</button>
+      </div>
+    </div>
+  </div>
+  <!-- 👆 新增結束 -->
   <div class="progress-overlay" id="progressOverlay">
     <div class="progress-spinner"></div>
     <div class="progress-text" id="progressText">處理中...</div>
   </div>
 
   <div class="toast" id="toast"></div>
+  <!-- 👇 新增：退出閱讀模式的浮動按鈕 -->
+  <button class="exit-reading-btn" id="exit-reading-btn" title="退出閱讀模式">
+    <svg viewBox="0 0 24 24">
+      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+    </svg>
+    退出閱讀模式
+  </button>
 
   <script>
     (function () {
@@ -1774,7 +1994,7 @@
         toast.textContent = msg;
         toast.className = 'toast show' + (type ? ' ' + type : '');
         if (toastTimer) clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => { toast.className = 'toast'; }, 2500);
+        toastTimer = setTimeout(() => {toast.className = 'toast';}, 2500);
       }
 
       function showProgress(text) {
@@ -1789,9 +2009,9 @@
         gfm: true, breaks: true, sanitize: false,
         highlight: function (code, lang) {
           if (lang && hljs.getLanguage(lang)) {
-            try { return hljs.highlight(code, { language: lang }).value; } catch (e) { }
+            try {return hljs.highlight(code, {language: lang}).value;} catch (e) { }
           }
-          try { return hljs.highlightAuto(code).value; } catch (e) { return code; }
+          try {return hljs.highlightAuto(code).value;} catch (e) {return code;}
         }
       });
 
@@ -1838,7 +2058,7 @@
       let timeoutId = null;
       input.addEventListener('input', () => {
         if (timeoutId) clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => { renderMarkdown(); timeoutId = null; }, 100);
+        timeoutId = setTimeout(() => {renderMarkdown(); timeoutId = null;}, 100);
       });
 
       input.addEventListener('keydown', (e) => {
@@ -2127,7 +2347,7 @@
           themeLabel.textContent = '淺色模式';
           document.getElementById('theme-icon').innerHTML = '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>';
         }
-        try { localStorage.setItem('md-editor-theme', isLight ? 'light' : 'dark'); } catch (e) { }
+        try {localStorage.setItem('md-editor-theme', isLight ? 'light' : 'dark');} catch (e) { }
       }
 
       toggleThemeBtn.addEventListener('click', () => {
@@ -2146,7 +2366,136 @@
         } catch (e) { }
         applyTheme(false);
       })();
+      // ===== 表格插入功能 =====
+      const tableBtn = document.getElementById('table-btn');
+      const tablePicker = document.getElementById('tablePicker');
+      const tableGrid = document.getElementById('tableGrid');
+      const tablePickerSize = document.getElementById('tablePickerSize');
+      const openCustomTableBtn = document.getElementById('open-custom-table');
 
+      const tableModal = document.getElementById('tableModal');
+      const tableCols = document.getElementById('table-cols');
+      const tableRows = document.getElementById('table-rows');
+      const tableCancel = document.getElementById('table-cancel');
+      const tableConfirm = document.getElementById('table-confirm');
+
+      let currentHoverRow = 0;
+      let currentHoverCol = 0;
+
+      // 初始化 5x5 網格
+      (function initTableGrid() {
+        tableGrid.innerHTML = '';
+        for (let r = 1; r <= 5; r++) {
+          for (let c = 1; c <= 5; c++) {
+            const cell = document.createElement('div');
+            cell.className = 'table-grid-cell';
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+
+            // 滑鼠移入
+            cell.addEventListener('mouseenter', () => {
+              currentHoverRow = r;
+              currentHoverCol = c;
+              tablePickerSize.textContent = `${c} x ${r}`;
+              updateGridHighlight();
+            });
+
+            // 點擊直接插入
+            cell.addEventListener('click', () => {
+              insertTable(c, r);
+              tablePicker.classList.remove('open');
+            });
+
+            tableGrid.appendChild(cell);
+          }
+        }
+      })();
+
+      function updateGridHighlight() {
+        const cells = tableGrid.querySelectorAll('.table-grid-cell');
+        cells.forEach(c => {
+          const r = parseInt(c.dataset.row);
+          const col = parseInt(c.dataset.col);
+          if (r <= currentHoverRow && col <= currentHoverCol) {
+            c.classList.add('active');
+          } else {
+            c.classList.remove('active');
+          }
+        });
+      }
+
+      // 點擊按鈕開關面板
+      tableBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wasOpen = tablePicker.classList.contains('open');
+        closeAllFormatDropdowns();
+        closeAllDropdowns();
+        if (!wasOpen) {
+          currentHoverRow = 0;
+          currentHoverCol = 0;
+          tablePickerSize.textContent = '0 x 0';
+          updateGridHighlight();
+          tablePicker.classList.add('open');
+        }
+      });
+
+      // 點擊「自訂大小」
+      openCustomTableBtn.addEventListener('click', () => {
+        tablePicker.classList.remove('open');
+        tableModal.classList.add('open');
+        setTimeout(() => tableCols.focus(), 50);
+      });
+
+      // 關閉自訂 Modal
+      tableCancel.addEventListener('click', () => tableModal.classList.remove('open'));
+      tableModal.addEventListener('click', (e) => {
+        if (e.target === tableModal) tableModal.classList.remove('open');
+      });
+
+      // 確認插入自訂表格
+      tableConfirm.addEventListener('click', () => {
+        const cols = parseInt(tableCols.value) || 1;
+        const rows = parseInt(tableRows.value) || 1;
+        if (cols < 1 || rows < 1) {
+          showToast('欄數與列數必須大於 0', 'error');
+          return;
+        }
+        insertTable(cols, rows);
+        tableModal.classList.remove('open');
+      });
+
+      // 生成表格字串（不要空格的版本）
+      function insertTable(cols, rows) {
+        let tableStr = '\n';
+
+        // 1. 產生標題列
+        let headerRow = '|';
+        for (let c = 1; c <= cols; c++) {
+          headerRow += `標題${c}|`;
+        }
+        tableStr += headerRow + '\n';
+
+        // 2. 產生分隔線
+        let dividerRow = '|';
+        for (let c = 1; c <= cols; c++) {
+          dividerRow += '---|';
+        }
+        tableStr += dividerRow + '\n';
+
+        // 3. 產生內容列
+        for (let r = 1; r <= rows; r++) {
+          let contentRow = '|';
+          for (let c = 1; c <= cols; c++) {
+            contentRow += `內容${c}|`;
+          }
+          tableStr += contentRow + '\n';
+        }
+
+        tableStr += '\n';
+
+        insertAtCursor(tableStr);
+      }
+      // ===== 表格功能結束 =====
       // ===== 連結對話框 =====
       function openLinkModal() {
         const start = input.selectionStart;
@@ -2162,12 +2511,12 @@
       }
 
       linkCancel.addEventListener('click', () => linkModal.classList.remove('open'));
-      linkModal.addEventListener('click', (e) => { if (e.target === linkModal) linkModal.classList.remove('open'); });
+      linkModal.addEventListener('click', (e) => {if (e.target === linkModal) linkModal.classList.remove('open');});
 
       linkConfirm.addEventListener('click', () => {
         const text = linkText.value.trim() || '連結文字';
         const url = linkUrl.value.trim();
-        if (!url) { showToast('請輸入網址', 'error'); return; }
+        if (!url) {showToast('請輸入網址', 'error'); return;}
         const start = input.selectionStart;
         const end = input.selectionEnd;
         if (start !== end) {
@@ -2186,8 +2535,8 @@
         linkModal.classList.remove('open');
       });
 
-      linkText.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); linkUrl.focus(); } });
-      linkUrl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); linkConfirm.click(); } });
+      linkText.addEventListener('keydown', (e) => {if (e.key === 'Enter') {e.preventDefault(); linkUrl.focus();} });
+      linkUrl.addEventListener('keydown', (e) => {if (e.key === 'Enter') {e.preventDefault(); linkConfirm.click();} });
 
       // ===== 圖片對話框 =====
       function openImageModal() {
@@ -2198,14 +2547,14 @@
       }
 
       imgCancel.addEventListener('click', () => imgModal.classList.remove('open'));
-      imgModal.addEventListener('click', (e) => { if (e.target === imgModal) imgModal.classList.remove('open'); });
-      imgUrl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); imgConfirm.click(); } });
-      imgAlt.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); imgConfirm.click(); } });
+      imgModal.addEventListener('click', (e) => {if (e.target === imgModal) imgModal.classList.remove('open');});
+      imgUrl.addEventListener('keydown', (e) => {if (e.key === 'Enter') {e.preventDefault(); imgConfirm.click();} });
+      imgAlt.addEventListener('keydown', (e) => {if (e.key === 'Enter') {e.preventDefault(); imgConfirm.click();} });
 
       imgConfirm.addEventListener('click', () => {
         const url = imgUrl.value.trim();
         const alt = imgAlt.value.trim() || '圖片';
-        if (!url) { showToast('請輸入圖片網址', 'error'); return; }
+        if (!url) {showToast('請輸入圖片網址', 'error'); return;}
         insertAtCursor('![' + alt + '](' + url + ')');
         imgModal.classList.remove('open');
       });
@@ -2372,6 +2721,9 @@
         if (!bgColorPanel.contains(e.target) && e.target !== bgcolorBtn) {
           bgColorPanel.classList.remove('open');
         }
+        if (!tablePicker.contains(e.target) && e.target !== tableBtn) {
+          tablePicker.classList.remove('open');
+        }
       });
 
       fileMenu.addEventListener('click', (e) => e.stopPropagation());
@@ -2383,7 +2735,7 @@
         openFolderBtn.addEventListener('click', async () => {
           closeAllDropdowns();
           try {
-            dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            dirHandle = await window.showDirectoryPicker({mode: 'readwrite'});
             await loadDirectoryFromHandle(dirHandle);
             readOnlyMode = false;
             folderNameText.textContent = dirHandle.name;
@@ -2421,7 +2773,7 @@
           if (entry.kind === 'file') {
             const lower = entry.name.toLowerCase();
             if (/\.(md|markdown|txt)$/.test(lower)) {
-              files.push({ name: entry.name, path: entryPath, handle: entry, type: 'md' });
+              files.push({name: entry.name, path: entryPath, handle: entry, type: 'md'});
             } else if (/\.(png|jpe?g|gif|webp|svg|bmp|ico)$/.test(lower)) {
               try {
                 const file = await entry.getFile();
@@ -2461,7 +2813,7 @@
           const lower = f.name.toLowerCase();
           if (/\.(md|markdown|txt)$/.test(lower)) {
             const content = await f.text();
-            files.push({ name: f.name, path: path, handle: null, content: content, type: 'md' });
+            files.push({name: f.name, path: path, handle: null, content: content, type: 'md'});
           } else if (/\.(png|jpe?g|gif|webp|svg|bmp|ico)$/.test(lower)) {
             const blobUrl = URL.createObjectURL(f);
             imageUrlCache.set(path, blobUrl);
@@ -2545,20 +2897,20 @@
       exportMdBtn.addEventListener('click', () => {
         closeAllDropdowns();
         const content = input.value;
-        if (!content.trim()) { showToast('目前沒有內容可以導出', 'error'); return; }
-        const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+        if (!content.trim()) {showToast('目前沒有內容可以導出', 'error'); return;}
+        const blob = new Blob([content], {type: 'text/markdown;charset=utf-8'});
         downloadBlob(blob, getBaseName() + '.md');
       });
 
       exportHtmlBtn.addEventListener('click', async () => {
         closeAllDropdowns();
         const content = input.value;
-        if (!content.trim()) { showToast('目前沒有內容可以導出', 'error'); return; }
+        if (!content.trim()) {showToast('目前沒有內容可以導出', 'error'); return;}
 
         showProgress('正在處理圖片...');
         try {
           const htmlContent = await generateStandaloneHtml();
-          const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+          const blob = new Blob([htmlContent], {type: 'text/html;charset=utf-8'});
           downloadBlob(blob, getBaseName() + '.html');
           showToast('已導出 HTML', 'success');
         } catch (err) {
@@ -2572,23 +2924,30 @@
       exportPdfBtn.addEventListener('click', () => {
         closeAllDropdowns();
         const content = input.value;
-        if (!content.trim()) { showToast('目前沒有內容可以導出', 'error'); return; }
+        if (!content.trim()) {showToast('目前沒有內容可以導出', 'error'); return;}
         const previewHtml = preview.innerHTML;
         printArea.innerHTML = previewHtml;
-        setTimeout(() => { window.print(); }, 100);
+        setTimeout(() => {window.print();}, 100);
         showToast('在列印對話框選「另存為 PDF」', 'success');
       });
 
       exportPngBtn.addEventListener('click', async () => {
         closeAllDropdowns();
         const content = input.value;
-        if (!content.trim()) { showToast('目前沒有內容可以導出', 'error'); return; }
+        if (!content.trim()) {showToast('目前沒有內容可以導出', 'error'); return;}
 
         showProgress('載入截圖工具...');
         try {
           await loadHtml2Canvas();
           showProgress('產生圖片中...');
 
+          // 1. 記住原本的閱讀模式狀態
+          const wasReadingMode = document.body.classList.contains('reading-mode');
+
+          // 2. 暫時強制開啟閱讀模式（讓寬度變大、加上左右留白）
+          document.body.classList.add('reading-mode');
+
+          // 3. 處理預覽區的滾動限制
           const previewContent = document.getElementById('previewContent');
           const originalOverflow = previewContent.style.overflow;
           const originalHeight = previewContent.style.height;
@@ -2597,23 +2956,34 @@
           previewContent.style.height = 'auto';
           previewContent.style.maxHeight = 'none';
 
-          await new Promise(r => setTimeout(r, 50));
+          // 等待一下讓版面重排（這很重要，不然會抓到舊的寬度）
+          await new Promise(r => setTimeout(r, 100));
 
           const isLight = document.body.classList.contains('theme-light');
-          const canvas = await html2canvas(preview, {
+
+          // 4. 開始截圖（我們把 target 改抓 previewContent，並加上自訂寬度限制）
+          const canvas = await html2canvas(previewContent, {
             backgroundColor: isLight ? '#ffffff' : '#1e1e1e',
-            scale: 2,
+            scale: 2, // 2倍解析度，超級清晰
             useCORS: true,
             allowTaint: true,
             logging: false,
-            windowWidth: preview.scrollWidth,
-            windowHeight: preview.scrollHeight
+            // 限制最大寬度為 1200px，避免在超寬螢幕上截出超長條圖
+            windowWidth: Math.min(previewContent.scrollWidth + 400, 1200),
+            windowHeight: previewContent.scrollHeight
           });
 
+          // 5. 截完圖，把樣式還原
           previewContent.style.overflow = originalOverflow;
           previewContent.style.height = originalHeight;
           previewContent.style.maxHeight = originalMaxHeight;
 
+          // 6. 如果原本不是閱讀模式，就把閱讀模式關掉
+          if (!wasReadingMode) {
+            document.body.classList.remove('reading-mode');
+          }
+
+          // 7. 下載圖片
           canvas.toBlob((blob) => {
             if (blob) {
               downloadBlob(blob, getBaseName() + '.png');
@@ -2651,7 +3021,7 @@
 
       function loadHtml2Canvas() {
         return new Promise((resolve, reject) => {
-          if (window.html2canvas) { resolve(); return; }
+          if (window.html2canvas) {resolve(); return;}
           const script = document.createElement('script');
           script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
           script.onload = resolve;
@@ -2791,13 +3161,39 @@ ${finalHtml}
           .replace(/>/g, '&gt;')
           .replace(/"/g, '&quot;');
       }
+      // ===== 閱讀模式 =====
+      const readingModeBtn = document.getElementById('reading-mode-btn');
+      const exitReadingBtn = document.getElementById('exit-reading-btn');
 
+      function toggleReadingMode(enable) {
+        if (enable) {
+          document.body.classList.add('reading-mode');
+          try {localStorage.setItem('md-editor-reading-mode', 'true');} catch (e) { }
+        } else {
+          document.body.classList.remove('reading-mode');
+          try {localStorage.setItem('md-editor-reading-mode', 'false');} catch (e) { }
+        }
+      }
+
+      readingModeBtn.addEventListener('click', () => toggleReadingMode(true));
+      exitReadingBtn.addEventListener('click', () => toggleReadingMode(false));
+
+      // 初始化閱讀模式狀態 (判斷上次是否在閱讀模式)
+      (function initReadingMode() {
+        try {
+          const saved = localStorage.getItem('md-editor-reading-mode');
+          if (saved === 'true') {
+            toggleReadingMode(true);
+          }
+        } catch (e) { }
+      })();
+      // ===== 閱讀模式結束 =====
       // ===== Flex 角色 =====
       function applyFlexRoles() {
         const prev = divider.previousElementSibling;
         const next = divider.nextElementSibling;
-        if (prev) { prev.classList.add('panel-fixed'); prev.classList.remove('panel-flex'); }
-        if (next) { next.classList.add('panel-flex'); next.classList.remove('panel-fixed'); }
+        if (prev) {prev.classList.add('panel-fixed'); prev.classList.remove('panel-flex');}
+        if (next) {next.classList.add('panel-flex'); next.classList.remove('panel-fixed');}
       }
 
       function updateTitles() {
@@ -2871,15 +3267,15 @@ ${finalHtml}
         return layout === 'horizontal' ? e.clientX : e.clientY;
       }
 
-      divider.addEventListener('mousedown', (e) => { e.preventDefault(); startResize(getCoord(e)); });
-      window.addEventListener('mousemove', (e) => { if (isResizing) { e.preventDefault(); doResize(getCoord(e)); } });
+      divider.addEventListener('mousedown', (e) => {e.preventDefault(); startResize(getCoord(e));});
+      window.addEventListener('mousemove', (e) => {if (isResizing) {e.preventDefault(); doResize(getCoord(e));} });
       window.addEventListener('mouseup', stopResize);
       divider.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) { e.preventDefault(); startResize(getCoord(e)); }
-      }, { passive: false });
+        if (e.touches.length === 1) {e.preventDefault(); startResize(getCoord(e));}
+      }, {passive: false});
       window.addEventListener('touchmove', (e) => {
-        if (isResizing && e.touches.length === 1) { e.preventDefault(); doResize(getCoord(e)); }
-      }, { passive: false });
+        if (isResizing && e.touches.length === 1) {e.preventDefault(); doResize(getCoord(e));}
+      }, {passive: false});
       window.addEventListener('touchend', stopResize);
       window.addEventListener('touchcancel', stopResize);
 
@@ -2905,8 +3301,8 @@ ${finalHtml}
         }
       }
 
-      layoutHorizontalBtn.addEventListener('click', () => { setLayout('horizontal'); closeAllDropdowns(); });
-      layoutVerticalBtn.addEventListener('click', () => { setLayout('vertical'); closeAllDropdowns(); });
+      layoutHorizontalBtn.addEventListener('click', () => {setLayout('horizontal'); closeAllDropdowns();});
+      layoutVerticalBtn.addEventListener('click', () => {setLayout('vertical'); closeAllDropdowns();});
 
       function setAutoWrap(enabled) {
         autoWrap = enabled;
@@ -2925,7 +3321,7 @@ ${finalHtml}
         }
       }
 
-      toggleWrapBtn.addEventListener('click', () => { setAutoWrap(!autoWrap); closeAllDropdowns(); });
+      toggleWrapBtn.addEventListener('click', () => {setAutoWrap(!autoWrap); closeAllDropdowns();});
 
       swapBtn.addEventListener('click', () => {
         isSwapped = !isSwapped;
